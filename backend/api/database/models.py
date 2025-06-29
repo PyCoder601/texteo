@@ -11,7 +11,7 @@ class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(index=True, unique=True)
     email: str = Field(index=True, unique=True)
-    password: str  # Hashed password
+    password: str
     avatar_url: Optional[str] = Field(default=None)
     bio: Optional[str] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.now)
@@ -25,6 +25,16 @@ class User(SQLModel, table=True):
         back_populates="user2",
         sa_relationship_kwargs={"foreign_keys": "[Conversation.user2_id]"},
     )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "avatar_url": self.avatar_url,
+            "bio": self.bio,
+            "created_at": self.created_at,
+        }
 
 
 # ---------------------

@@ -1,11 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
-from typing import Annotated
-
+from fastapi import APIRouter, HTTPException, Request
 from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse
 
-from backend.api.database.db import get_async_session
 from backend.api.database.models import User
 from backend.api.database.schemas import (
     UserResponse,
@@ -13,6 +9,7 @@ from backend.api.database.schemas import (
     TokenResponse,
     RegisterSchema,
 )
+from backend.api.utils.deps import AsyncSessionDep
 from backend.api.utils.jwt import (
     create_access_token,
     create_refresh_token,
@@ -21,8 +18,6 @@ from backend.api.utils.jwt import (
 from backend.api.utils.password import verify_password, hash_password
 
 router = APIRouter()
-
-AsyncSessionDep = Annotated[AsyncSession, Depends(get_async_session)]
 
 
 @router.post("/login", response_model=UserResponse)
@@ -59,15 +54,13 @@ async def login(session: AsyncSessionDep, data: LoginSchema):
 
 @router.post("/register", response_model=UserResponse)
 async def register(session: AsyncSessionDep, data: RegisterSchema):
-    user = await session.exec(select(User).where(User.email == data.email))  # type: ignore
-    print(user)
-    user = user.first()
-    if user:
-        raise HTTPException(status_code=400, detail="Email déjà utilisé")
-    user = await session.exec(select(User).where(User.username == data.username))  # type: ignore
-    user = user.first()
-    if user:
-        raise HTTPException(status_code=400, detail="Username déjà utilisé")
+    existing = await session.exec(
+        select(User).where(User.username == data.username, User.email == data.email)
+    )
+    if existing.first():
+        raise HTTPException(
+            status_code=400, detail="Nom d'utilisateur ou email existant."
+        )
 
     new_user = User(
         username=data.username,

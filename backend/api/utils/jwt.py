@@ -2,6 +2,7 @@ import os
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
+from fastapi import HTTPException
 from jose import jwt, JWTError, ExpiredSignatureError
 
 load_dotenv()
@@ -32,8 +33,10 @@ def create_refresh_token(data: dict):
 def verify_token(token: str, token_type: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        if payload.get("type") == token_type:
+        if payload.get("type") != token_type:
             raise JWTError()
         return payload
-    except ExpiredSignatureError or JWTError:
-        return None
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")

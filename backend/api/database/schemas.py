@@ -55,10 +55,10 @@ class ContactCreate(BaseModel):
     alias_name: Optional[str] = None
 
 
-class ContactOut(BaseModel):
+class ContactResponse(BaseModel):
     id: int
-    owner_id: int
-    contact_id: int
+    user_id: int
+    contact: UserBase
     alias_name: Optional[str]
 
 

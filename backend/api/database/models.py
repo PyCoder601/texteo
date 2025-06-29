@@ -59,7 +59,10 @@ class Contact(SQLModel, table=True):
     )
     contact: Optional["User"] = Relationship(
         back_populates="in_contacts_of",
-        sa_relationship_kwargs={"foreign_keys": "[Contact.contact_id]"},
+        sa_relationship_kwargs={
+            "foreign_keys": "[Contact.contact_id]",
+            "lazy": "joined",
+        },
     )
 
 

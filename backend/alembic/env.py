@@ -15,7 +15,7 @@ sys.path.insert(0, str(project_root))
 
 from sqlmodel import SQLModel
 
-from backend.api.database.models import User, Message, Discussion, DiscussionUser
+from backend.api.database.models import User, Contact, Conversation, Message
 from alembic import context
 
 # Alembic config object
@@ -52,7 +52,7 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            compare_type=True,  # utile si tu modifies les types de colonnes
+            compare_type=True,
         )
 
         with context.begin_transaction():

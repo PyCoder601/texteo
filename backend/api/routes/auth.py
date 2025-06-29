@@ -1,29 +1,37 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy.sql.annotation import Annotated
+from typing import Annotated
+
+from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse
 
 from backend.api.database.db import get_async_session
 from backend.api.database.models import User
-from backend.api.database.schemas import UserResponse, LoginSchema, TokenResponse
+from backend.api.database.schemas import (
+    UserResponse,
+    LoginSchema,
+    TokenResponse,
+    RegisterSchema,
+)
 from backend.api.utils.jwt import (
     create_access_token,
     create_refresh_token,
     verify_token,
 )
-from backend.api.utils.password import verify_password
+from backend.api.utils.password import verify_password, hash_password
 
 router = APIRouter()
 
-AsyncSessionDep = Annotated[AsyncSession, Depends(get_async_session())]
+AsyncSessionDep = Annotated[AsyncSession, Depends(get_async_session)]
 
 
 @router.post("/login", response_model=UserResponse)
 async def login(session: AsyncSessionDep, data: LoginSchema):
     username = data.username
-    user = await session.execute(
-        session.query(User).filter(User.username == username)
-    ).scalar_one_or_none()
+    user = await session.exec(select(User).where(User.username == username))  # type: ignore
+    print(user)
+    user = user.first()
+    print(user)
     if user is None or not verify_password(data.password, user.password):
         raise HTTPException(
             status_code=401, detail="Nom d'utilisateur ou mot de passe incorrecte"
@@ -50,22 +58,21 @@ async def login(session: AsyncSessionDep, data: LoginSchema):
 
 
 @router.post("/register", response_model=UserResponse)
-async def register(session: AsyncSessionDep, data: LoginSchema):
-    user = await session.execute(
-        session.query(User).filter(User.username == data.username)
-    ).scalar_one_or_none()
-    if user:
-        raise HTTPException(status_code=400, detail="Nom d'utilisateur déjà utilisé")
-    user = await session.execute(
-        session.query(User).filter(User.email == data.email)
-    ).scalar_one_or_none()
+async def register(session: AsyncSessionDep, data: RegisterSchema):
+    user = await session.exec(select(User).where(User.email == data.email))  # type: ignore
+    print(user)
+    user = user.first()
     if user:
         raise HTTPException(status_code=400, detail="Email déjà utilisé")
+    user = await session.exec(select(User).where(User.username == data.username))  # type: ignore
+    user = user.first()
+    if user:
+        raise HTTPException(status_code=400, detail="Username déjà utilisé")
 
     new_user = User(
         username=data.username,
         email=data.email,
-        password=data.password,
+        password=hash_password(data.password),
         avatar_url=data.avatar_url,
         bio=data.bio,
     )

@@ -8,15 +8,18 @@ from pydantic import BaseModel, EmailStr, constr
 # -------------------------
 
 
-class UserCreate(BaseModel):
-    username: constr(min_length=3, max_length=50)
+class LoginSchema(BaseModel):
+    username: str
+    password: str
+
+
+class RegisterSchema(BaseModel):
+    username: str
     email: EmailStr
     password: constr(min_length=6)
-
-
-class LoginSchema(BaseModel):
-    email: EmailStr
-    password: str
+    avatar_url: Optional[str] = None
+    bio: Optional[str] = None
+    created_at: Optional[datetime] = None
 
 
 class TokenResponse(BaseModel):
@@ -35,9 +38,6 @@ class UserBase(BaseModel):
     avatar_url: Optional[str] = None
     bio: Optional[str] = None
     created_at: Optional[datetime] = None
-
-    class Config:
-        orm_mode = True
 
 
 class UserResponse(BaseModel):
@@ -61,9 +61,6 @@ class ContactOut(BaseModel):
     contact_id: int
     alias_name: Optional[str]
 
-    class Config:
-        orm_mode = True
-
 
 # -------------------------
 # CONVERSATION
@@ -79,9 +76,6 @@ class ConversationOut(BaseModel):
     user1_id: int
     user2_id: int
     created_at: datetime
-
-    class Config:
-        orm_mode = True
 
 
 # -------------------------
@@ -102,9 +96,6 @@ class MessageOut(BaseModel):
     created_at: datetime
     is_read: bool
 
-    class Config:
-        orm_mode = True
-
 
 # -------------------------
 # NOTIFICATION
@@ -117,6 +108,3 @@ class NotificationOut(BaseModel):
     message_id: int
     is_seen: bool
     created_at: datetime
-
-    class Config:
-        orm_mode = True

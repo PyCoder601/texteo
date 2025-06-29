@@ -16,7 +16,14 @@ class User(SQLModel, table=True):
     bio: Optional[str] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.now)
 
-    contacts: list["Contact"] = Relationship(back_populates="owner")
+    contacts_added: list["Contact"] = Relationship(
+        back_populates="adder",
+        sa_relationship_kwargs={"foreign_keys": "[Contact.user_id]"},
+    )
+    in_contacts_of: list["Contact"] = Relationship(
+        back_populates="contact",
+        sa_relationship_kwargs={"foreign_keys": "[Contact.contact_id]"},
+    )
     conversations1: list["Conversation"] = Relationship(
         back_populates="user1",
         sa_relationship_kwargs={"foreign_keys": "[Conversation.user1_id]"},
@@ -33,7 +40,7 @@ class User(SQLModel, table=True):
             "email": self.email,
             "avatar_url": self.avatar_url,
             "bio": self.bio,
-            "created_at": self.created_at,
+            "created_at": self.created_at.isoformat(),
         }
 
 
@@ -42,11 +49,18 @@ class User(SQLModel, table=True):
 # ---------------------
 class Contact(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    owner_id: int = Field(foreign_key="user.id")
+    user_id: int = Field(foreign_key="user.id")
     contact_id: int = Field(foreign_key="user.id")
     alias_name: Optional[str] = None
 
-    owner: Optional[User] = Relationship(back_populates="contacts")
+    adder: Optional["User"] = Relationship(
+        back_populates="contacts_added",
+        sa_relationship_kwargs={"foreign_keys": "[Contact.user_id]"},
+    )
+    contact: Optional["User"] = Relationship(
+        back_populates="in_contacts_of",
+        sa_relationship_kwargs={"foreign_keys": "[Contact.contact_id]"},
+    )
 
 
 # ---------------------

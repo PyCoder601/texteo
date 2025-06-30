@@ -19,9 +19,9 @@ async def list_contacts(session: AsyncSessionDep, current_user: CurrUserDep):
 
 @router.post("/contact", response_model=ContactResponse)
 async def create_contact(
-        data: ContactCreate,
-        session: AsyncSessionDep,
-        current_user: CurrUserDep,
+    data: ContactCreate,
+    session: AsyncSessionDep,
+    current_user: CurrUserDep,
 ):
     contact_user = await session.get(User, data.contact_id)
     if not contact_user:
@@ -48,9 +48,9 @@ async def create_contact(
 
 @router.delete("/contact/{contact_id}", status_code=204)
 async def delete_contact(
-        contact_id: int,
-        session: AsyncSessionDep,
-        current_user: CurrUserDep,
+    contact_id: int,
+    session: AsyncSessionDep,
+    current_user: CurrUserDep,
 ):
     result = await session.exec(
         select(Contact).where(
@@ -68,9 +68,9 @@ async def delete_contact(
 
 @router.get("/contacts/{contact_id}", response_model=ContactResponse)
 async def get_contact(
-        contact_id: int,
-        session: AsyncSessionDep,
-        current_user: CurrUserDep,
+    contact_id: int,
+    session: AsyncSessionDep,
+    current_user: CurrUserDep,
 ):
     result = await session.exec(select(Contact).where(Contact.id == contact_id))
     contact = result.first()

@@ -74,14 +74,21 @@ class Conversation(SQLModel, table=True):
     user1_id: int = Field(foreign_key="user.id")
     user2_id: int = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.now)
+    last_message_at: Optional[datetime] = Field(default=None)
 
     user1: Optional[User] = Relationship(
         back_populates="conversations1",
-        sa_relationship_kwargs={"foreign_keys": "[Conversation.user1_id]"},
+        sa_relationship_kwargs={
+            "foreign_keys": "[Conversation.user1_id]",
+            "lazy": "joined",
+        },
     )
     user2: Optional[User] = Relationship(
         back_populates="conversations2",
-        sa_relationship_kwargs={"foreign_keys": "[Conversation.user2_id]"},
+        sa_relationship_kwargs={
+            "foreign_keys": "[Conversation.user2_id]",
+            "lazy": "joined",
+        },
     )
     messages: list["Message"] = Relationship(back_populates="conversation")
 
@@ -98,3 +105,13 @@ class Message(SQLModel, table=True):
     is_read: bool = Field(default=False)
 
     conversation: Optional[Conversation] = Relationship(back_populates="messages")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "conversation_id": self.conversation_id,
+            "sender_id": self.sender_id,
+            "content": self.content,
+            "created_at": self.created_at.isoformat(),
+            "is_read": self.is_read,
+        }

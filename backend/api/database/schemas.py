@@ -67,15 +67,21 @@ class ContactResponse(BaseModel):
 # -------------------------
 
 
+class FriendResponse(BaseModel):
+    id: int
+    username: str
+    avatar_url: Optional[str] = None
+
+
 class ConversationCreate(BaseModel):
     user_id: int
 
 
-class ConversationOut(BaseModel):
+class ConversationResponse(BaseModel):
     id: int
-    user1_id: int
-    user2_id: int
-    created_at: datetime
+    friend: Optional[FriendResponse] = None
+    last_message_at: Optional[str | datetime] = None
+    last_message: Optional["MessageResponse"] = None
 
 
 # -------------------------
@@ -88,12 +94,12 @@ class MessageCreate(BaseModel):
     content: str
 
 
-class MessageOut(BaseModel):
+class MessageResponse(BaseModel):
     id: int
     conversation_id: int
     sender_id: int
     content: str
-    created_at: datetime
+    created_at: str | datetime
     is_read: bool
 
 

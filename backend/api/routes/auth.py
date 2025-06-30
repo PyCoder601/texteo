@@ -9,7 +9,7 @@ from backend.api.database.schemas import (
     TokenResponse,
     RegisterSchema,
 )
-from backend.api.utils.deps import AsyncSessionDep
+from backend.api.utils.deps import AsyncSessionDep, CurrUserDep
 from backend.api.utils.jwt import (
     create_access_token,
     create_refresh_token,
@@ -130,3 +130,11 @@ async def refresh_token_func(request: Request):
     )
 
     return response
+
+
+@router.get("/user/{user_id]", response_model=UserResponse)
+async def get_me(session: AsyncSessionDep, current_user: CurrUserDep, user_id: int):
+    user = await session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user.to_dict()

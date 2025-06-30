@@ -61,9 +61,9 @@ async def get_conversation(session: AsyncSessionDep, current_user: CurrUserDep):
 
 @router.delete("/conversation/{conversation_id}", status_code=204)
 async def delete_conversation(
-        conversation_id: int,
-        session: AsyncSessionDep,
-        current_user: CurrUserDep,
+    conversation_id: int,
+    session: AsyncSessionDep,
+    current_user: CurrUserDep,
 ):
     conversations = await session.exec(
         select(Conversation).where(Conversation.id == conversation_id)

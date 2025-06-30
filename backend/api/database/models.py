@@ -15,6 +15,7 @@ class User(SQLModel, table=True):
     avatar_url: Optional[str] = Field(default=None)
     bio: Optional[str] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.now)
+    last_seen: Optional[datetime] = Field(default=None)
 
     contacts_added: list["Contact"] = Relationship(
         back_populates="adder",
@@ -41,6 +42,7 @@ class User(SQLModel, table=True):
             "avatar_url": self.avatar_url,
             "bio": self.bio,
             "created_at": self.created_at.isoformat(),
+            "last_seen": self.last_seen.isoformat() if self.last_seen else None,
         }
 
 

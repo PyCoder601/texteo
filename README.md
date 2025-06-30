@@ -1,2 +1,0 @@
-# Texteo app
-

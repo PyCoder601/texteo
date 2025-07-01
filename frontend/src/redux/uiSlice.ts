@@ -1,4 +1,4 @@
-import {UIType} from "../../utils/types";
+import {UIType} from "@/utils/types";
 import {createSlice} from "@reduxjs/toolkit";
 
 const initialState: UIType = {

@@ -1,5 +1,5 @@
 import {store} from "@/redux/store";
-import {AxiosResponse} from "axios";
+import axios, {AxiosResponse} from "axios";
 import {ACCESS_TOKEN} from "@/utils/constant";
 import {loginUser, logoutUser} from "@/redux/userSlice";
 import api from "@/service/api";
@@ -8,11 +8,16 @@ import {LoginDataType, RegisterDataType} from "@/utils/types";
 export default async function authenticate(data: RegisterDataType | LoginDataType, type: 'login' | 'register') {
     try {
         const res: AxiosResponse = await api.post(`/${type}/`, data, {withCredentials: true});
+        console.log(res.data)
         store.dispatch(loginUser(res.data.user));
         sessionStorage.setItem(ACCESS_TOKEN, res.data.token);
         return true
     } catch (err) {
-        return err instanceof Error ? err.message : "Erreur lors de l'authentification"
+        if (axios.isAxiosError(err)) {
+            return err.response?.data?.detail || "Erreur inconnue"
+        } else {
+            return "Erreur réseau ou serveur";
+        }
     }
 }
 

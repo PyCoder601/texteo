@@ -29,7 +29,7 @@ async def login(session: AsyncSessionDep, data: LoginSchema):
     print(user)
     if user is None or not verify_password(data.password, user.password):
         raise HTTPException(
-            status_code=401, detail="Nom d'utilisateur ou mot de passe incorrecte"
+            status_code=400, detail="Nom d'utilisateur ou mot de passe incorrecte"
         )
     user_data = user.to_dict()
     access_token = create_access_token(user_data)
@@ -55,7 +55,9 @@ async def login(session: AsyncSessionDep, data: LoginSchema):
 @router.post("/register", response_model=UserResponse)
 async def register(session: AsyncSessionDep, data: RegisterSchema):
     existing = await session.exec(
-        select(User).where(User.username == data.username, User.email == data.email)
+        select(User).where(
+            (User.username == data.username) | (User.email == data.email)
+        )
     )
     if existing.first():
         raise HTTPException(

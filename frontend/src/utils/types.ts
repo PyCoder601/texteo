@@ -12,14 +12,15 @@ export interface RegisterDataType extends LoginDataType {
 }
 
 export interface UserDataType {
+    id: number;
     username: string;
     email: string;
     bio: string;
     avatar_url: string;
-    last_seen: string;
+    last_seen: string | null;
+    created_at: string;
 }
 
 export interface UserState {
     user: UserDataType | null
-    token: string | null
 }

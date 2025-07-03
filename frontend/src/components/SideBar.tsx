@@ -5,8 +5,11 @@ import {motion} from "framer-motion";
 import React from "react";
 import {AppDispatch} from "@/redux/store";
 import {useDispatch, useSelector} from "react-redux";
+import {selectUser} from "@/redux/userSlice";
+import {UserDataType} from "@/utils/types";
 
 export default function Sidebar({setPageToRender}: { setPageToRender: (page: string) => void }) {
+    const user: UserDataType | null = useSelector(selectUser)
     const dispatch: AppDispatch = useDispatch();
     const darkMode: boolean = useSelector(selectDarkMode);
     return (
@@ -15,7 +18,7 @@ export default function Sidebar({setPageToRender}: { setPageToRender: (page: str
                 <Img
                     width={32}
                     height={32}
-                    src="/avatar.jpg"
+                    src={user?.avatar_url || "/avatar.jpg"}
                     alt="avatar"
                     className="w-8 h-8 rounded-full"
                     onClick={() => setPageToRender("profileCard")}

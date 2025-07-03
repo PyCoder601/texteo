@@ -2,18 +2,20 @@ import {Pencil, Check, Camera} from "lucide-react";
 import Image from "next/image";
 import {useSelector, useDispatch} from "react-redux";
 import {selectDarkMode} from "@/redux/uiSlice";
-import {selectUser} from "@/redux/userSlice";
+import {selectUser, setUser} from "@/redux/userSlice";
 import {UserDataType} from "@/utils/types";
 import React, {useRef, useState} from "react";
+import {AppDispatch} from "@/redux/store";
+import api from "@/service/api";
 
 function ProfileCard() {
     const darkMode: boolean = useSelector(selectDarkMode);
     const user: UserDataType | null = useSelector(selectUser);
-    const dispatch = useDispatch();
+    const dispatch: AppDispatch = useDispatch();
 
     const [username, setUsername] = useState<string | undefined>(user?.username);
     const [bio, setBio] = useState<string | undefined>(user?.bio);
-    const [profilePicture, setProfilePicture] = useState<string | null>("/avatar.jpg");
+    const [profilePicture, setProfilePicture] = useState<string | null>(user?.avatar_url || null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
 
@@ -39,20 +41,29 @@ function ProfileCard() {
 
         const formData = new FormData();
         if (selectedFile) {
-            formData.append('profilePicture', selectedFile);
+            formData.append('profile_picture', selectedFile);
         }
-        
+        if (username && username !== user.username) {
+            formData.append('username', username);
+        }
+        if (bio && bio !== user.bio) {
+            formData.append('bio', bio!);
+        }
+        try {
+            const response = await api.patch('/me', formData);
+            dispatch(setUser(response.data));
+        } catch (e) {
+            alert("An error was occurred")
+            console.log(e)
+        }
+
     };
 
     const handleUpdateUsername = () => {
-        // Here you would typically call an API to update the username
-        console.log("Updating username to:", username);
         setEditUsername(false);
     };
 
     const handleUpdateBio = () => {
-        // Here you would typically call an API to update the bio
-        console.log("Updating bio to:", bio);
         setEditBio(false);
     };
 
@@ -67,7 +78,7 @@ function ProfileCard() {
                 <div className="flex justify-center">
                     <div className="relative w-32 h-32 group cursor-pointer" onClick={handleImageClick}>
                         <Image
-                            src={profilePicture || "/avatar.jpg"}
+                            src={profilePicture || user?.avatar_url || "/avatar.jpg"}
                             alt="Profile picture"
                             layout="fill"
                             objectFit="cover"

@@ -1,4 +1,9 @@
-from fastapi import APIRouter, HTTPException, Request
+import os
+import shutil
+from datetime import datetime
+from typing import Optional
+
+from fastapi import APIRouter, HTTPException, Request, Form, UploadFile
 from sqlmodel import select
 from starlette.responses import JSONResponse
 
@@ -8,6 +13,7 @@ from backend.api.database.schemas import (
     LoginSchema,
     TokenResponse,
     RegisterSchema,
+    UserBase,
 )
 from backend.api.utils.deps import AsyncSessionDep, CurrUserDep
 from backend.api.utils.jwt import (
@@ -24,9 +30,7 @@ router = APIRouter()
 async def login(session: AsyncSessionDep, data: LoginSchema):
     username = data.username
     user = await session.exec(select(User).where(User.username == username))  # type: ignore
-    print(user)
     user = user.first()
-    print(user)
     if user is None or not verify_password(data.password, user.password):
         raise HTTPException(
             status_code=400, detail="Nom d'utilisateur ou mot de passe incorrecte"
@@ -139,4 +143,42 @@ async def get_me(session: AsyncSessionDep, current_user: CurrUserDep, user_id: i
     user = await session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    return user.to_dict()
+
+
+UPLOAD_FOLDER = "static/uploads/avatars"  # à adapter
+
+
+@router.patch("/me", response_model=UserBase)
+async def update_me(
+        session: AsyncSessionDep,
+        current_user: CurrUserDep,
+        username: Optional[str] = Form(None),
+        bio: Optional[str] = Form(None),
+        profile_picture: Optional[UploadFile] = None,
+):
+    user = await session.get(User, current_user["id"])
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if username:
+        user.username = username
+    if bio:
+        user.bio = bio
+
+    if profile_picture:
+        ext = os.path.splitext(profile_picture.filename)[-1]
+        filename = f"{user.id}_{int(datetime.now().timestamp())}{ext}"
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(profile_picture.file, buffer)  # type: ignore
+
+        user.avatar_url = f"/{file_path}"
+
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+
     return user.to_dict()

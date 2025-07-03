@@ -37,7 +37,6 @@ class UserBase(BaseModel):
     email: EmailStr
     avatar_url: Optional[str] = None
     bio: Optional[str] = None
-    created_at: Optional[datetime] = None
 
 
 class UserResponse(BaseModel):

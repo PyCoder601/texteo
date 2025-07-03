@@ -1,16 +1,20 @@
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 from starlette.responses import JSONResponse
+from dotenv import load_dotenv
 
-from backend.api.database.models import Conversation, Message
+from backend.api.database.models import Conversation, Message, User
 from backend.api.database.schemas import (
     ConversationResponse,
     MessageResponse,
     FriendResponse,
+    FriendCreate,
 )
 from backend.api.utils.deps import AsyncSessionDep, CurrUserDep
+from backend.api.utils.get_avatar_url import avatar_url
 
 router = APIRouter()
+load_dotenv()
 
 
 @router.get("/conversation", response_model=list[ConversationResponse])
@@ -42,17 +46,17 @@ async def get_conversation(session: AsyncSessionDep, current_user: CurrUserDep):
                     FriendResponse(
                         id=conv.user1.id,
                         username=conv.user1.username,
-                        avatar_url=conv.user1.avatar_url,
+                        avatar_url=avatar_url(conv.user1.avatar_url),
                     )
                     if conv.user1.id != user_id
                     else FriendResponse(
                         id=conv.user2.id,
                         username=conv.user2.username,
-                        avatar_url=conv.user2.avatar_url,
+                        avatar_url=avatar_url(conv.user2.avatar_url),
                     )
                 ),
                 last_message=last_msg.to_dict() if last_msg else None,
-                last_message_at=last_msg.created_at.isoformat(),
+                last_message_at=last_msg.created_at.isoformat() if last_msg else None,
             )
         )
 
@@ -61,9 +65,9 @@ async def get_conversation(session: AsyncSessionDep, current_user: CurrUserDep):
 
 @router.delete("/conversation/{conversation_id}", status_code=204)
 async def delete_conversation(
-    conversation_id: int,
-    session: AsyncSessionDep,
-    current_user: CurrUserDep,
+        conversation_id: int,
+        session: AsyncSessionDep,
+        current_user: CurrUserDep,
 ):
     conversations = await session.exec(
         select(Conversation).where(Conversation.id == conversation_id)
@@ -87,3 +91,38 @@ async def get_messages(id: int, session: AsyncSessionDep):
         .limit(30)
     )
     return [message.to_dict() for message in result.all()]
+
+
+@router.post("/conversation", response_model=ConversationResponse, status_code=201)
+async def create_conversation(
+        session: AsyncSessionDep, current_user: CurrUserDep, data: FriendCreate
+):
+    friend = await session.exec(select(User).where(User.username == data.username))
+    friend = friend.first()
+    print(f"friend: {friend}")
+    if not friend:
+        raise HTTPException(status_code=404, detail="Ce nom d'utilisateur n'existe pas")
+    user_id = current_user["id"]
+    conversation = Conversation(user1_id=user_id, user2_id=friend.id)
+    session.add(conversation)
+    await session.commit()
+    await session.refresh(conversation)
+    response = ConversationResponse(
+        id=conversation.id,
+        friend=(
+            FriendResponse(
+                id=conversation.user1.id,
+                username=conversation.user1.username,
+                avatar_url=avatar_url(conversation.user1.avatar_url),
+            )
+            if conversation.user1.id != user_id
+            else FriendResponse(
+                id=conversation.user2.id,
+                username=conversation.user2.username,
+                avatar_url=avatar_url(conversation.user2.avatar_url),
+            )
+        ),
+        last_message=None,
+        last_message_at=None,
+    )
+    return response

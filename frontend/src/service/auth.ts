@@ -8,7 +8,6 @@ import {LoginDataType, RegisterDataType} from "@/utils/types";
 export default async function authenticate(data: RegisterDataType | LoginDataType, type: 'login' | 'register') {
     try {
         const res: AxiosResponse = await api.post(`/${type}/`, data, {withCredentials: true});
-        console.log(res.data)
         store.dispatch(setUser(res.data.user));
         sessionStorage.setItem(ACCESS_TOKEN, res.data.token);
         return true

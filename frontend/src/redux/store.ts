@@ -13,17 +13,19 @@ import {
 import {Persistor} from "redux-persist/es/types";
 import uiReducer from "./uiSlice";
 import userReducer from "./userSlice";
+import conversationReducer from "./conversationSlice";
 import storageSession from "redux-persist/lib/storage/session";
 
 const rootReducer = combineReducers({
     ui: uiReducer,
     user: userReducer,
+    conversation: conversationReducer
 });
 
 const persistConfig = {
     key: "root",
     storage: storageSession,
-    whitelist: ["ui", "user"],
+    whitelist: ["ui", "user", "conversation"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

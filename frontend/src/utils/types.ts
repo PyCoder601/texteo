@@ -24,3 +24,29 @@ export interface UserDataType {
 export interface UserState {
     user: UserDataType | null
 }
+
+export interface FriendType {
+    id: number,
+    username: string,
+    avatar_url: string | null
+}
+
+export interface MessageType {
+    id: number;
+    sender_id: number;
+    content: string;
+    created_at: string;
+}
+
+export interface ConversationDataType {
+    id: number;
+    friend: FriendType;
+    last_message: MessageType | null;
+    last_message_at: string | null
+}
+
+export interface ConversationState {
+    conversations: ConversationDataType[];
+    currentConversation: ConversationDataType | null;
+}
+

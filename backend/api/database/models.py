@@ -84,9 +84,7 @@ class Message(SQLModel, table=True):
     def to_dict(self):
         return {
             "id": self.id,
-            "conversation_id": self.conversation_id,
             "sender_id": self.sender_id,
             "content": self.content,
             "created_at": self.created_at.isoformat(),
-            "is_read": self.is_read,
         }

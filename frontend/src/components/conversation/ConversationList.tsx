@@ -4,10 +4,11 @@ import ConversationListItem from "@/components/conversation/ConversationListItem
 import {useSelector} from "react-redux";
 import {selectDarkMode} from "@/redux/uiSlice";
 import {Search} from "lucide-react";
+import {selectConversations} from "@/redux/conversationSlice";
 
 function ConversationList() {
     const darkMode = useSelector(selectDarkMode);
-
+    const conversations = useSelector(selectConversations);
     return (
         <div className={`flex flex-col h-full ${darkMode ? "bg-slate-800/50" : "bg-white/80"} backdrop-blur-sm`}>
             <div className="p-3">
@@ -15,6 +16,7 @@ function ConversationList() {
                     <Search
                         className={`absolute top-1/2 left-3 transform -translate-y-1/2 ${darkMode ? "text-gray-400" : "text-gray-500"}`}
                         size={20}/>
+
                     <input
                         type="text"
                         placeholder="Search or start new chat"
@@ -23,10 +25,9 @@ function ConversationList() {
                 </div>
             </div>
             <div className="flex-1 overflow-y-auto">
-                <ConversationListItem name="Alice" lastMessage="See you tomorrow!" time="10:42 AM" unread={2}/>
-                <ConversationListItem name="Bob" lastMessage="Okay, sounds good." time="10:30 AM"/>
-                <ConversationListItem name="Charlie" lastMessage="Photo" time="Yesterday"/>
-                <ConversationListItem name="David" lastMessage="Thanks!" time="Yesterday"/>
+                {conversations.map((conversation) => (
+                    <ConversationListItem key={conversation.id} conversation={conversation}/>
+                ))}
             </div>
         </div>
     );

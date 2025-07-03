@@ -49,6 +49,10 @@ class UserResponse(BaseModel):
 # -------------------------
 
 
+class FriendCreate(BaseModel):
+    username: str
+
+
 class FriendResponse(BaseModel):
     id: int
     username: str
@@ -78,11 +82,9 @@ class MessageCreate(BaseModel):
 
 class MessageResponse(BaseModel):
     id: int
-    conversation_id: int
     sender_id: int
     content: str
     created_at: str | datetime
-    is_read: bool
 
 
 # -------------------------

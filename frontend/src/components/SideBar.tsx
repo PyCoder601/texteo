@@ -1,6 +1,6 @@
 import Img from 'next/image'
 import {selectDarkMode, toggleDarkMode} from "@/redux/uiSlice";
-import {Moon, Sun, MessageSquare, Users} from "lucide-react";
+import {Moon, Sun, MessageSquare, MessageSquareDiff} from "lucide-react";
 import {motion} from "framer-motion";
 import React from "react";
 import {AppDispatch} from "@/redux/store";
@@ -15,14 +15,20 @@ export default function Sidebar({setPageToRender}: { setPageToRender: (page: str
     return (
         <div className="w-16 h-screen flex flex-col justify-between py-4">
             <div className="flex flex-col items-center space-y-4">
-                <Img
-                    width={32}
-                    height={32}
-                    src={user?.avatar_url || "/avatar.jpg"}
-                    alt="avatar"
-                    className="w-8 h-8 rounded-full"
-                    onClick={() => setPageToRender("profileCard")}
-                />
+                <div className={"cursor-pointer"}>
+                    <Img
+                        src={user?.avatar_url || "/avatar.jpg"}
+                        alt="avatar"
+                        width={30}
+                        height={32}
+                        objectFit="cover"
+                        className="rounded-full border-4 border-gray-500  transition-opacity"
+                        onClick={() => setPageToRender("profileCard")}
+                    />
+                </div>
+                <MessageSquareDiff size={32} className={"text-gray-500 hover:text-gray-800 cursor-pointer"}
+                                   onClick={() => setPageToRender("addContact")}/>
+
                 <MessageSquare size={32} className="text-gray-500 hover:text-gray-800 cursor-pointer"
                                onClick={() => setPageToRender("conversationList")}/>
                 <motion.button

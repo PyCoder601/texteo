@@ -6,10 +6,15 @@ import {useSelector} from "react-redux";
 import {selectDarkMode} from "@/redux/uiSlice";
 import Sidebar from "@/components/SideBar";
 import ProfileCard from "@/components/ProfieCard";
+import AddContact from "@/components/conversation/AddContact";
+import {fetchConversations} from "@/redux/conversationSlice";
 
 function Page() {
     const darkMode = useSelector(selectDarkMode);
     const [pageToRender, setPageToRender] = React.useState<string>('conversationList');
+    React.useEffect(() => {
+        fetchConversations();
+    }, [])
 
     return (
         <main
@@ -18,6 +23,7 @@ function Page() {
             <div className={`w-full md:w-1/3 lg:w-1/4 border-r ${darkMode ? "border-slate-700" : "border-gray-200"}`}>
                 {pageToRender === 'conversationList' && <ConversationList/>}
                 {pageToRender === 'profileCard' && <ProfileCard/>}
+                {pageToRender === 'addContact' && <AddContact setPageToRender={setPageToRender}/>}
             </div>
             <div className={`hidden md:flex flex-col w-2/3 lg:w-3/4`}>
                 <ChatWindow/>

@@ -1,11 +1,13 @@
 import os
+from sys import prefix
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from backend.api.routes import auth
+from backend.api.routes import auth, conversation
+from backend.api.websocket import chat
 
 load_dotenv()
 
@@ -22,3 +24,5 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(auth.router, prefix="/api")
+app.include_router(conversation.router, prefix="/api")
+app.include_router(chat.router, prefix="/ws")

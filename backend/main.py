@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from backend.api.routes import auth, contacts
+from backend.api.routes import auth
 
 load_dotenv()
 
@@ -22,4 +22,3 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(auth.router, prefix="/api")
-app.include_router(contacts.router, prefix="/api")

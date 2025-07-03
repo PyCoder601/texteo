@@ -45,23 +45,6 @@ class UserResponse(BaseModel):
 
 
 # -------------------------
-# CONTACT
-# -------------------------
-
-
-class ContactCreate(BaseModel):
-    contact_id: int
-    alias_name: Optional[str] = None
-
-
-class ContactResponse(BaseModel):
-    id: int
-    user_id: int
-    contact: UserBase
-    alias_name: Optional[str]
-
-
-# -------------------------
 # CONVERSATION
 # -------------------------
 

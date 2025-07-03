@@ -21,14 +21,6 @@ class User(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.now)
     last_seen: Optional[datetime] = Field(default=None)
 
-    contacts_added: list["Contact"] = Relationship(
-        back_populates="adder",
-        sa_relationship_kwargs={"foreign_keys": "[Contact.user_id]"},
-    )
-    in_contacts_of: list["Contact"] = Relationship(
-        back_populates="contact",
-        sa_relationship_kwargs={"foreign_keys": "[Contact.contact_id]"},
-    )
     conversations1: list["Conversation"] = Relationship(
         back_populates="user1",
         sa_relationship_kwargs={"foreign_keys": "[Conversation.user1_id]"},
@@ -47,28 +39,6 @@ class User(SQLModel, table=True):
             "bio": self.bio,
             "last_seen": self.last_seen.isoformat() if self.last_seen else None,
         }
-
-
-# ---------------------
-# Contact
-# ---------------------
-class Contact(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id")
-    contact_id: int = Field(foreign_key="user.id")
-    alias_name: Optional[str] = None
-
-    adder: Optional["User"] = Relationship(
-        back_populates="contacts_added",
-        sa_relationship_kwargs={"foreign_keys": "[Contact.user_id]"},
-    )
-    contact: Optional["User"] = Relationship(
-        back_populates="in_contacts_of",
-        sa_relationship_kwargs={
-            "foreign_keys": "[Contact.contact_id]",
-            "lazy": "joined",
-        },
-    )
 
 
 # ---------------------

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import ConversationListItem from "@/components/ConversationListItem";
+import ConversationListItem from "@/components/conversation/ConversationListItem";
 import {useSelector} from "react-redux";
 import {selectDarkMode} from "@/redux/uiSlice";
 import {Search} from "lucide-react";

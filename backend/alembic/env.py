@@ -15,7 +15,7 @@ sys.path.insert(0, str(project_root))
 
 from sqlmodel import SQLModel
 
-from backend.api.database.models import User, Contact, Conversation, Message
+from backend.api.database.models import User, Conversation, Message
 from alembic import context
 
 # Alembic config object

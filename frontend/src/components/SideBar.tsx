@@ -25,8 +25,6 @@ export default function Sidebar({setPageToRender}: { setPageToRender: (page: str
                 />
                 <MessageSquare size={32} className="text-gray-500 hover:text-gray-800 cursor-pointer"
                                onClick={() => setPageToRender("conversationList")}/>
-                <Users size={32} className="text-gray-500 hover:text-gray-800 cursor-pointer"
-                       onClick={() => setPageToRender("contacts")}/>
                 <motion.button
                     onClick={() => dispatch(toggleDarkMode())}
                     className={`p-2 rounded-full ${darkMode ? "bg-gray-700/50" : "bg-gray-200/50"}`}

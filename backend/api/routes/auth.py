@@ -151,11 +151,11 @@ UPLOAD_FOLDER = "static/uploads/avatars"  # à adapter
 
 @router.patch("/me", response_model=UserBase)
 async def update_me(
-        session: AsyncSessionDep,
-        current_user: CurrUserDep,
-        username: Optional[str] = Form(None),
-        bio: Optional[str] = Form(None),
-        profile_picture: Optional[UploadFile] = None,
+    session: AsyncSessionDep,
+    current_user: CurrUserDep,
+    username: Optional[str] = Form(None),
+    bio: Optional[str] = Form(None),
+    profile_picture: Optional[UploadFile] = None,
 ):
     user = await session.get(User, current_user["id"])
     if not user:

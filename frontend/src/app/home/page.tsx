@@ -1,7 +1,7 @@
 "use client"
 import React from "react";
-import ConversationList from "@/components/ConversationList";
-import ChatWindow from "@/components/ChatWindow";
+import ConversationList from "@/components/conversation/ConversationList";
+import ChatWindow from "@/components/chat/ChatWindow";
 import {useSelector} from "react-redux";
 import {selectDarkMode} from "@/redux/uiSlice";
 import Sidebar from "@/components/SideBar";

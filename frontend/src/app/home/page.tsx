@@ -2,20 +2,21 @@
 import React from "react";
 import ConversationList from "@/components/conversation/ConversationList";
 import ChatWindow from "@/components/chat/ChatWindow";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {selectDarkMode} from "@/redux/uiSlice";
 import Sidebar from "@/components/SideBar";
 import ProfileCard from "@/components/ProfieCard";
 import AddContact from "@/components/conversation/AddContact";
 import {fetchConversations} from "@/redux/conversationSlice";
+import {AppDispatch} from "@/redux/store";
 
 function Page() {
     const darkMode = useSelector(selectDarkMode);
     const [pageToRender, setPageToRender] = React.useState<string>('conversationList');
-    // TODO
+    const dispatch: AppDispatch = useDispatch();
     React.useEffect(() => {
-        fetchConversations();
-    }, [])
+        dispatch(fetchConversations())
+    }, [dispatch])
 
     return (
         <main

@@ -17,8 +17,8 @@ router = APIRouter()
 load_dotenv()
 
 
-@router.get("/conversation", response_model=list[ConversationResponse])
-async def get_conversation(session: AsyncSessionDep, current_user: CurrUserDep):
+@router.get("/conversations", response_model=list[ConversationResponse])
+async def get_conversations(session: AsyncSessionDep, current_user: CurrUserDep):
     user_id = current_user["id"]
 
     result = await session.exec(
@@ -59,7 +59,7 @@ async def get_conversation(session: AsyncSessionDep, current_user: CurrUserDep):
                 last_message_at=last_msg.created_at.isoformat() if last_msg else None,
             )
         )
-
+    print(responses)
     return responses
 
 

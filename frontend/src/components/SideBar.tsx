@@ -13,13 +13,14 @@ export default function Sidebar({setPageToRender}: { setPageToRender: (page: str
     const dispatch: AppDispatch = useDispatch();
     const darkMode: boolean = useSelector(selectDarkMode);
     return (
-        <div className="w-16 h-screen flex flex-col justify-between py-4">
+        <div className="w-16 h-screen flex flex-col justify-between py-2">
             <div className="flex flex-col items-center space-y-4">
                 <div className={"cursor-pointer"}>
                     <Img
-                        src={user?.avatar_url || "/avatar.jpg"}
+                        src={user?.avatar_url.includes("None") === false ?
+                            user?.avatar_url : "/avatar.jpg"}
                         alt="avatar"
-                        width={30}
+                        width={32}
                         height={32}
                         objectFit="cover"
                         className="rounded-full border-4 border-gray-500  transition-opacity"

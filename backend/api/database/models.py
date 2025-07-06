@@ -1,11 +1,9 @@
 from datetime import datetime
 from typing import Optional
-import os
 
 from sqlmodel import SQLModel, Field, Relationship
-from dotenv import load_dotenv
 
-load_dotenv()
+from backend.api.utils.get_avatar_url import avatar_url
 
 
 # ---------------------
@@ -35,7 +33,7 @@ class User(SQLModel, table=True):
             "id": self.id,
             "username": self.username,
             "email": self.email,
-            "avatar_url": f"{os.getenv("BACKEND_URL")}{self.avatar_url}",
+            "avatar_url": avatar_url(self.avatar_url),
             "bio": self.bio,
             "last_seen": self.last_seen.isoformat() if self.last_seen else None,
         }

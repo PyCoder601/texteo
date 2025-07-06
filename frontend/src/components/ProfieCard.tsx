@@ -14,8 +14,8 @@ function ProfileCard() {
     const dispatch: AppDispatch = useDispatch();
 
     const [username, setUsername] = useState<string | undefined>(user?.username);
-    const [bio, setBio] = useState<string | undefined>(user?.bio);
-    const [profilePicture, setProfilePicture] = useState<string | null>(user?.avatar_url || null);
+    const [bio, setBio] = useState<string | undefined>(user?.bio || "");
+    const [profilePicture, setProfilePicture] = useState<string | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
 
@@ -56,6 +56,11 @@ function ProfileCard() {
             alert("An error was occurred")
             console.log(e)
         }
+        setSelectedFile(null);
+        setUsername(user.username);
+        setBio(user.bio);
+        setEditUsername(false);
+        setEditBio(false);
 
     };
 
@@ -78,7 +83,8 @@ function ProfileCard() {
                 <div className="flex justify-center">
                     <div className="relative w-32 h-32 group cursor-pointer" onClick={handleImageClick}>
                         <Image
-                            src={profilePicture || user?.avatar_url || "/avatar.jpg"}
+                            src={profilePicture !== null ? profilePicture : user?.avatar_url.includes("None") === false ?
+                                user?.avatar_url : "/avatar.jpg"}
                             alt="Profile picture"
                             layout="fill"
                             objectFit="cover"

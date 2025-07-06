@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, constr
+from pydantic import BaseModel, EmailStr
 
 
 # -------------------------
@@ -16,7 +16,7 @@ class LoginSchema(BaseModel):
 class RegisterSchema(BaseModel):
     username: str
     email: EmailStr
-    password: constr(min_length=6)
+    password: str
     avatar_url: Optional[str] = None
     bio: Optional[str] = None
     created_at: Optional[datetime] = None

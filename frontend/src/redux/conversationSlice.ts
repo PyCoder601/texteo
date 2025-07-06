@@ -11,7 +11,7 @@ const initialState: ConversationState = {
 export const fetchConversations = createAsyncThunk(
     'conversation/fetchConversations',
     async () => {
-        const response: AxiosResponse = await api.get('conversation/')
+        const response: AxiosResponse = await api.get('conversations/')
         return response.data
     },
 )

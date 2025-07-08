@@ -59,7 +59,6 @@ async def get_conversations(session: AsyncSessionDep, current_user: CurrUserDep)
                 last_message_at=last_msg.created_at.isoformat() if last_msg else None,
             )
         )
-    print(responses)
     return responses
 
 

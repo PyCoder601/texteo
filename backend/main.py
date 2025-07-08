@@ -1,5 +1,4 @@
 import os
-from sys import prefix
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -25,4 +24,4 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(conversation.router, prefix="/api")
-app.include_router(chat.router, prefix="/ws")
+app.include_router(chat.router, prefix="/api")

@@ -45,8 +45,10 @@ export interface ConversationDataType {
     last_message_at: string | null
 }
 
+
 export interface ConversationState {
     conversations: ConversationDataType[];
     currentConversation: ConversationDataType | null;
+    messages: MessageType[];
 }
 

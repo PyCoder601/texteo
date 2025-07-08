@@ -13,13 +13,14 @@ active_connections: dict[int, list[WebSocket]] = {}
 
 
 @router.websocket("/chat/{conversation_id}")
-async def chat(websocket: WebSocket, conversation_id, session: AsyncSessionDep):
-    await websocket.accept()
-    token = websocket.headers.get("Authorization").replace("Bearer ", "")
-    user = await get_current_user(token)
-    user = await session.get(User, user["id"])
+async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSessionDep):
+    conversation_id = int(conversation_id)
+    await websocket.accept(subprotocol="chat")
+    token = websocket.query_params.get("token")
+    user_dict = await get_current_user(token)
+    user = await session.get(User, user_dict["id"])
     if not user:
-        await websocket.close(code=401)
+        await websocket.close()
         return
 
     if conversation_id not in active_connections:
@@ -34,7 +35,7 @@ async def chat(websocket: WebSocket, conversation_id, session: AsyncSessionDep):
             content = data.get("content")
             new_message = Message(
                 conversation_id=conversation_id,
-                user_id=user.id,
+                sender_id=user.id,
                 content=content,
             )
             session.add(new_message)
@@ -44,8 +45,8 @@ async def chat(websocket: WebSocket, conversation_id, session: AsyncSessionDep):
             for ws in active_connections[conversation_id]:
                 await ws.send_json(
                     {
-                        "from": user.id,
-                        "message": content,
+                        "sender_id": user.id,
+                        "content": content,
                         "created_at": new_message.created_at.isoformat(),
                     }
                 )

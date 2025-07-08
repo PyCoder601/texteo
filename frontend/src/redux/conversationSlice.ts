@@ -6,12 +6,21 @@ import {AxiosResponse} from "axios";
 const initialState: ConversationState = {
     conversations: [],
     currentConversation: null,
+    messages: []
 }
 
 export const fetchConversations = createAsyncThunk(
     'conversation/fetchConversations',
     async () => {
         const response: AxiosResponse = await api.get('conversations/')
+        return response.data
+    },
+)
+
+export const fetchMessages = createAsyncThunk(
+    'conversation/fetchMessages',
+    async (conversationId: number) => {
+        const response: AxiosResponse = await api.get(`conversations/${conversationId}/messages/`)
         return response.data
     },
 )
@@ -25,6 +34,9 @@ const conversationSlice = createSlice({
         },
         setConversations: (state, action) => {
             state.conversations = action.payload;
+        },
+        addMessage: (state, action) => {
+            state.messages.push(action.payload);
         }
     },
     extraReducers: (builder) => {
@@ -38,10 +50,19 @@ const conversationSlice = createSlice({
             .addCase(fetchConversations.rejected, (state) => {
                 state.conversations = []
             })
+            .addCase(fetchMessages.pending, (state) => {
+                state.messages = []
+            })
+            .addCase(fetchMessages.fulfilled, (state, action) => {
+                state.messages = action.payload
+            })
+            .addCase(fetchMessages.rejected, (state) => {
+                state.messages = []
+            })
     },
 })
 
-export const {setCurrentConversation, setConversations} = conversationSlice.actions;
+export const {setCurrentConversation, setConversations, addMessage} = conversationSlice.actions;
 export default conversationSlice.reducer;
 
 export const selectConversations = (state:
@@ -50,3 +71,5 @@ export const selectCurrentConversation = (state: {
     conversation: ConversationState
 }) =>
     state.conversation.currentConversation;
+
+export const selectMessages = (state: { conversation: ConversationState }) => state.conversation.messages;

@@ -19,7 +19,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=401, detail="Invalid token")
     payload.pop("type")
     payload.pop("exp")
-    print(payload)
     return payload
 
 

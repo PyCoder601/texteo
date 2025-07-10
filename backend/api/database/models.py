@@ -73,6 +73,7 @@ class Message(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     conversation_id: int = Field(foreign_key="conversation.id")
     sender_id: int = Field(foreign_key="user.id")
+    type: str = Field(default="text")
     content: str
     created_at: datetime = Field(default_factory=datetime.now)
     is_read: bool = Field(default=False)
@@ -83,6 +84,9 @@ class Message(SQLModel, table=True):
         return {
             "id": self.id,
             "sender_id": self.sender_id,
-            "content": self.content,
+            "type": self.type,
+            "content": (
+                self.content if self.type == "text" else avatar_url(self.content)
+            ),
             "created_at": self.created_at.isoformat(),
         }

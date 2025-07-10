@@ -69,9 +69,10 @@ function AddContact({setPageToRender}: { setPageToRender: (page: string) => void
                     <UserPlus size={20} className="mr-2"/>
                     Commencer
                 </button>
+                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
             </div>
         </div>
     );
-};
+}
 
 export default AddContact;

@@ -12,13 +12,10 @@ function ProfileCard() {
     const darkMode: boolean = useSelector(selectDarkMode);
     const user: UserDataType | null = useSelector(selectUser);
     const dispatch: AppDispatch = useDispatch();
-
     const [username, setUsername] = useState<string | undefined>(user?.username);
     const [bio, setBio] = useState<string | undefined>(user?.bio || "");
     const [profilePicture, setProfilePicture] = useState<string | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-
     const [editUsername, setEditUsername] = useState<boolean>(false);
     const [editBio, setEditBio] = useState<boolean>(false);
 
@@ -38,7 +35,7 @@ function ProfileCard() {
 
     const handleProfileUpdate = async () => {
         if (!user) return;
-
+        console.log(selectedFile)
         const formData = new FormData();
         if (selectedFile) {
             formData.append('profile_picture', selectedFile);

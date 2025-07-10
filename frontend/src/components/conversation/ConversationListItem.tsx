@@ -32,7 +32,8 @@ function ConversationListItem({conversation}: { conversation: ConversationDataTy
                     <h2 className="font-semibold">{friend.username}</h2>
                 </div>
                 <div className="flex justify-between items-center">
-                    <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>{last_message?.content}</p>
+                    <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>{last_message?.type === "text" ?
+                        last_message.content : "send a photo"}</p>
                 </div>
             </div>
         </div>

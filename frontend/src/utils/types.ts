@@ -35,6 +35,7 @@ export interface MessageType {
     id: number;
     sender_id: number;
     content: string;
+    type: "text" | "photo";
     created_at: string;
 }
 

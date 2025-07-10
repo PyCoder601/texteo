@@ -34,7 +34,7 @@ async def get_conversations(session: AsyncSessionDep, current_user: CurrUserDep)
         msg_result = await session.exec(
             select(Message)
             .where(Message.conversation_id == conv.id)
-            .order_by(Message.created_at)
+            .order_by(Message.created_at.desc())
             .limit(1)
         )
         last_msg = msg_result.first()
@@ -87,7 +87,6 @@ async def get_messages(id: int, session: AsyncSessionDep):
         select(Message)
         .where(Message.conversation_id == id)
         .order_by(Message.created_at)
-        .limit(30)
     )
     return [message.to_dict() for message in result.all()]
 
@@ -98,7 +97,6 @@ async def create_conversation(
 ):
     friend = await session.exec(select(User).where(User.username == data.username))
     friend = friend.first()
-    print(f"friend: {friend}")
     if not friend:
         raise HTTPException(status_code=404, detail="Ce nom d'utilisateur n'existe pas")
     user_id = current_user["id"]

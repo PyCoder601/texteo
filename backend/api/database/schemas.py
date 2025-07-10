@@ -75,15 +75,11 @@ class ConversationResponse(BaseModel):
 # -------------------------
 
 
-class MessageCreate(BaseModel):
-    conversation_id: int
-    content: str
-
-
 class MessageResponse(BaseModel):
     id: int
     sender_id: int
     content: str
+    type: str
     created_at: str | datetime
 
 

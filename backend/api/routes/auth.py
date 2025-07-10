@@ -146,7 +146,7 @@ async def get_me(session: AsyncSessionDep, current_user: CurrUserDep, user_id: i
     return user.to_dict()
 
 
-UPLOAD_FOLDER = "static/uploads/avatars"  # à adapter
+UPLOAD_FOLDER = "static/uploads/avatars"
 
 
 @router.patch("/me", response_model=UserBase)

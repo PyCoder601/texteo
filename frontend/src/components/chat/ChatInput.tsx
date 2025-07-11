@@ -7,6 +7,8 @@ import {ACCESS_TOKEN} from "@/utils/constant";
 import {AppDispatch} from "@/redux/store";
 import {addMessage, fetchConversations, selectCurrentConversation} from "@/redux/conversationSlice";
 
+const websocketUrl: string | undefined = process.env.NEXT_PUBLIC_WEBSOCKET_URL;
+
 function ChatInput() {
     const darkMode = useSelector(selectDarkMode);
     const token = sessionStorage.getItem(ACCESS_TOKEN)
@@ -21,7 +23,7 @@ function ChatInput() {
             return;
         }
 
-        const ws = new WebSocket(`ws://localhost:8002/api/chat/${currentConversation.id}?token=${token}`, "chat");
+        const ws = new WebSocket(`${websocketUrl}/${currentConversation.id}?token=${token}`, "chat");
         socketRef.current = ws;
 
         ws.onopen = () => {

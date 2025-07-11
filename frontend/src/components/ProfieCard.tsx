@@ -54,8 +54,6 @@ function ProfileCard() {
             console.log(e)
         }
         setSelectedFile(null);
-        setUsername(user.username);
-        setBio(user.bio);
         setEditUsername(false);
         setEditBio(false);
 

@@ -18,7 +18,6 @@ function ChatWindow() {
     const user: UserDataType | null = useSelector(selectUser);
     const currentConversation = useSelector(selectCurrentConversation);
     const dispatch: AppDispatch = useDispatch();
-    console.log(messages)
     useEffect(() => {
         if (messages.length !== 0 || !currentConversation?.id) return;
         dispatch(fetchMessages(currentConversation.id))

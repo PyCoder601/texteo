@@ -77,28 +77,54 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
     try:
         while True:
             message = await websocket.receive()
-
+            print(message)
             if message.get("type") == "websocket.disconnect":
                 break
 
             if "text" in message:
                 data = json.loads(message["text"])
-                new_message = await handle_text_message(
-                    session, conversation_id, user, data
-                )
+
+                if data.get("type") == "text":
+                    new_message = await handle_text_message(
+                        session, conversation_id, user, data
+                    )
+                    for ws in active_connections[conversation_id]:
+                        await ws.send_json(new_message.to_dict())
+
+                elif data.get("type") == "supprimer_message":
+                    message_id = data.get("message_id")
+                    message = await session.get(Message, message_id)
+
+                    await session.delete(message)
+                    await session.commit()
+
+                    for ws in active_connections[conversation_id]:
+                        await ws.send_json(
+                            {"message_id": message_id, "type": "supprimer_message"}
+                        )
+                else:
+                    message_id = data.get("message_id")
+                    reaction = data.get("reaction")
+                    message = await session.get(Message, message_id)
+
+                    message.reaction = reaction
+                    await session.commit()
+                    await session.refresh(message)
+
+                    for ws in active_connections[conversation_id]:
+                        await ws.send_json(message.to_dict())
 
             elif "bytes" in message and message["bytes"]:
                 new_message = await handle_binary_message(
                     session, conversation_id, user, message["bytes"]
                 )
 
+                for ws in active_connections[conversation_id]:
+                    await ws.send_json(new_message.to_dict())
+
             else:
                 print("Unsupported message type or empty payload.")
                 continue
-
-            if new_message:
-                for ws in active_connections[conversation_id]:
-                    await ws.send_json(new_message.to_dict())
 
     except WebSocketDisconnect:
         pass
@@ -109,29 +135,6 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
         if not active_connections[conversation_id]:
             del active_connections[conversation_id]
 
-        await async_redis.set(f"user:{user.id}:online", 0)
-        user.last_seen = datetime.now()
-        await session.commit()
-
-
-@router.websocket("/set-online/")
-async def set_online(websocket: WebSocket, session: AsyncSessionDep):
-    await websocket.accept()
-    token = websocket.headers.get("Authorization").replace("Bearer ", "")
-    user = await get_current_user(token)
-    user = await session.get(User, user["id"])
-    if not user:
-        await websocket.close(code=401)
-        return
-    await async_redis.set(f"user:{user.id}:online", 1)
-    await async_redis.expire(f"user:{user.id}:online", 60)
-
-    try:
-        while True:
-            await async_redis.expire(f"user:{user.id}:online", 60)
-            await asyncio.sleep(30)
-
-    except WebSocketDisconnect:
         await async_redis.set(f"user:{user.id}:online", 0)
         user.last_seen = datetime.now()
         await session.commit()

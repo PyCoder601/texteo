@@ -37,6 +37,10 @@ const conversationSlice = createSlice({
         },
         addMessage: (state, action) => {
             state.messages.push(action.payload);
+        },
+        deleteMessage: (state, action) => {
+            const index = state.messages.findIndex(message => message.id === action.payload)
+            state.messages.splice(index, 1)
         }
     },
     extraReducers: (builder) => {
@@ -62,7 +66,7 @@ const conversationSlice = createSlice({
     },
 })
 
-export const {setCurrentConversation, setConversations, addMessage} = conversationSlice.actions;
+export const {setCurrentConversation, setConversations, addMessage, deleteMessage} = conversationSlice.actions;
 export default conversationSlice.reducer;
 
 export const selectConversations = (state:

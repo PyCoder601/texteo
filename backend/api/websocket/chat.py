@@ -106,7 +106,6 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
         print(f"An unexpected error occurred: {e}")
     finally:
         active_connections[conversation_id].remove(websocket)
-        print("remove")
         if not active_connections[conversation_id]:
             del active_connections[conversation_id]
 

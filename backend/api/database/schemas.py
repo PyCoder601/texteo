@@ -79,8 +79,14 @@ class MessageResponse(BaseModel):
     id: int
     sender_id: int
     content: str
+    reaction: str | None
     type: str
     created_at: str | datetime
+
+
+class ReactionCreate(BaseModel):
+    reaction: str
+    message_id: int
 
 
 # -------------------------

@@ -28,7 +28,6 @@ async def get_conversations(session: AsyncSessionDep, current_user: CurrUserDep)
     )
     conversations = result.all()
 
-    # Obtenir le dernier message pour chaque conversation
     responses = []
     for conv in conversations:
         msg_result = await session.exec(

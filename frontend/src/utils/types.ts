@@ -1,5 +1,7 @@
 export interface UIType {
     darkMode: boolean;
+    toShowOptions: number | null
+    toShowReactions: number | null
 }
 
 export interface LoginDataType {
@@ -36,6 +38,7 @@ export interface MessageType {
     sender_id: number;
     content: string;
     type: "text" | "photo";
+    reaction: string | null;
     created_at: string;
 }
 

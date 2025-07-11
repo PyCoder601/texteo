@@ -75,6 +75,7 @@ class Message(SQLModel, table=True):
     sender_id: int = Field(foreign_key="user.id")
     type: str = Field(default="text")
     content: str
+    reaction: Optional[str] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.now)
     is_read: bool = Field(default=False)
 
@@ -88,5 +89,6 @@ class Message(SQLModel, table=True):
             "content": (
                 self.content if self.type == "text" else avatar_url(self.content)
             ),
+            "reaction": self.reaction,
             "created_at": self.created_at.isoformat(),
         }

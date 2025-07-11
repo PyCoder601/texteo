@@ -18,7 +18,7 @@ function ChatWindow() {
     const user: UserDataType | null = useSelector(selectUser);
     const currentConversation = useSelector(selectCurrentConversation);
     const dispatch: AppDispatch = useDispatch();
-
+    console.log(messages)
     useEffect(() => {
         if (messages.length !== 0 || !currentConversation?.id) return;
         dispatch(fetchMessages(currentConversation.id))
@@ -55,6 +55,8 @@ function ChatWindow() {
                             return <ChatMessage key={message.id} text={message.content}
                                                 time={formatDate(message.created_at)}
                                                 type={message.type}
+                                                reactionProp={message.reaction}
+                                                id={message.id}
                                                 sent={message.sender_id === user?.id}/>
                         })
                     }

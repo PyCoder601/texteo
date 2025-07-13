@@ -1,26 +1,31 @@
-import asyncio
-
 import json
 import os
 
 from datetime import datetime
 
 from fastapi import APIRouter, WebSocket
+from sqlmodel import select
 from starlette.websockets import WebSocketDisconnect
 
 from backend.api.database.models import Message, User
-from backend.api.routes.redis import async_redis
 from backend.api.utils.deps import get_current_user, AsyncSessionDep
 
 router = APIRouter()
-active_connections: dict[int, list[WebSocket]] = {}
+active_connections_in_discussion: dict[int, list[tuple[WebSocket, int]]] = {}
+online_users: dict[int, WebSocket] = {}
+
 
 UPLOAD_FOLDER = "static/uploads/messages"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
+def is_user_connected(discussion_id: int, user_id: int) -> bool:
+    connections = active_connections_in_discussion.get(discussion_id, [])
+    return any(uid == user_id for _, uid in connections)
+
+
 async def handle_text_message(
-        session: AsyncSessionDep, conversation_id: int, user: User, data: dict
+    session: AsyncSessionDep, conversation_id: int, user: User, data: dict
 ):
     content = data.get("content")
     new_message = Message(
@@ -36,7 +41,7 @@ async def handle_text_message(
 
 
 async def handle_binary_message(
-        session: AsyncSessionDep, conversation_id: int, user: User, message_bytes: bytes
+    session: AsyncSessionDep, conversation_id: int, user: User, message_bytes: bytes
 ):
     try:
         filename = f"{user.id}_{int(datetime.now().timestamp())}.jpg"
@@ -66,31 +71,52 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
 
     user_dict = await get_current_user(token)
     user = await session.get(User, user_dict["id"])
+
     if not user:
         await websocket.close(code=4001)
         return
 
-    if conversation_id not in active_connections:
-        active_connections[conversation_id] = []
-    active_connections[conversation_id].append(websocket)
+    if conversation_id not in active_connections_in_discussion:
+        active_connections_in_discussion[conversation_id] = []
+    active_connections_in_discussion[conversation_id].append((websocket, user.id))
+
+    online_users[user.id] = websocket
 
     try:
         while True:
             message = await websocket.receive()
-            print(message)
+
             if message.get("type") == "websocket.disconnect":
                 break
 
             if "text" in message:
                 data = json.loads(message["text"])
 
+                # envoie text: Message
                 if data.get("type") == "text":
                     new_message = await handle_text_message(
                         session, conversation_id, user, data
                     )
-                    for ws in active_connections[conversation_id]:
-                        await ws.send_json(new_message.to_dict())
 
+                    for ws, _ in active_connections_in_discussion[conversation_id]:
+                        await ws.send_json(
+                            {
+                                "new_message_data": new_message.to_dict(),
+                                "type": "new_message",
+                            }
+                        )
+
+                    # si nouveau message, envoie notification au receiver
+                    receiver_id = data.get("receiver_id")
+                    if not is_user_connected(conversation_id, receiver_id):
+                        ws = online_users.get(receiver_id)
+                        if ws:
+                            await ws.send_json(
+                                {
+                                    "type": "new_conversation",
+                                }
+                            )
+                # text: supprimer un message
                 elif data.get("type") == "supprimer_message":
                     message_id = data.get("message_id")
                     message = await session.get(Message, message_id)
@@ -98,10 +124,12 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
                     await session.delete(message)
                     await session.commit()
 
-                    for ws in active_connections[conversation_id]:
+                    for ws, _ in active_connections_in_discussion[conversation_id]:
                         await ws.send_json(
                             {"message_id": message_id, "type": "supprimer_message"}
                         )
+
+                # text: reaction
                 else:
                     message_id = data.get("message_id")
                     reaction = data.get("reaction")
@@ -111,16 +139,24 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
                     await session.commit()
                     await session.refresh(message)
 
-                    for ws in active_connections[conversation_id]:
-                        await ws.send_json(message.to_dict())
+                    for ws, _ in active_connections_in_discussion[conversation_id]:
+                        await ws.send_json(
+                            {"message_data": message.to_dict(), "type": "reaction"}
+                        )
 
+            # Envoi photo
             elif "bytes" in message and message["bytes"]:
                 new_message = await handle_binary_message(
                     session, conversation_id, user, message["bytes"]
                 )
 
-                for ws in active_connections[conversation_id]:
-                    await ws.send_json(new_message.to_dict())
+                for ws, _ in active_connections_in_discussion[conversation_id]:
+                    await ws.send_json(
+                        {
+                            "new_message_data": new_message.to_dict(),
+                            "type": "new_message",
+                        }
+                    )
 
             else:
                 print("Unsupported message type or empty payload.")
@@ -131,10 +167,11 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
     finally:
-        active_connections[conversation_id].remove(websocket)
-        if not active_connections[conversation_id]:
-            del active_connections[conversation_id]
+        active_connections_in_discussion[conversation_id].remove((websocket, user.id))
+        if not active_connections_in_discussion[conversation_id]:
+            del active_connections_in_discussion[conversation_id]
 
-        await async_redis.set(f"user:{user.id}:online", 0)
+        del online_users[user.id]
+        # await async_redis.set(f"user:{user.id}:online", 0)
         user.last_seen = datetime.now()
         await session.commit()

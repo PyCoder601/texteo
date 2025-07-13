@@ -1,57 +1,23 @@
 "use client";
-import React from "react";
+import React, {RefObject} from "react";
 import {Paperclip, Send} from "lucide-react";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {selectDarkMode} from "@/redux/uiSlice";
-import {ACCESS_TOKEN} from "@/utils/constant";
-import {AppDispatch} from "@/redux/store";
-import {addMessage, fetchConversations, selectCurrentConversation} from "@/redux/conversationSlice";
+import { selectCurrentConversation } from "@/redux/conversationSlice";
 
-const websocketUrl: string | undefined = process.env.NEXT_PUBLIC_WEBSOCKET_URL;
 
-function ChatInput() {
+type ChatWindowProps = {
+  socketRef: RefObject<WebSocket | null>;
+};
+
+function ChatInput({socketRef}: ChatWindowProps) {
     const darkMode = useSelector(selectDarkMode);
-    const token = sessionStorage.getItem(ACCESS_TOKEN)
-    const socketRef = React.useRef<WebSocket | null>(null);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
-    const currentConversation = useSelector(selectCurrentConversation)
-    const dispatch: AppDispatch = useDispatch();
     const [newMessage, setNewMessage] = React.useState<string>("");
-
-    React.useEffect(() => {
-        if (!token || !currentConversation?.id) {
-            return;
-        }
-
-        const ws = new WebSocket(`${websocketUrl}/${currentConversation.id}?token=${token}`, "chat");
-        socketRef.current = ws;
-
-        ws.onopen = () => {
-            console.log("WebSocket connected");
-        };
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            dispatch(addMessage(data));
-            dispatch(fetchConversations());
-        };
-
-        ws.onclose = () => {
-            console.log("WebSocket closed");
-        };
-
-        ws.onerror = (error) => {
-            console.log("WebSocket error:", error);
-        };
-
-        return () => {
-            ws.close();
-        };
-    }, [currentConversation?.id, token, dispatch]);
-
+    const currentConversation = useSelector(selectCurrentConversation);
     const sendMessage = () => {
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN && newMessage.trim()) {
-            socketRef.current.send(JSON.stringify({content: newMessage, type: "text"}));
+            socketRef.current.send(JSON.stringify({content: newMessage, type: "text", receiver_id: currentConversation?.friend.id}));
             setNewMessage("");
         }
     };

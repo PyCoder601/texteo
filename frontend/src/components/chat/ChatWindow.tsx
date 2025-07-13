@@ -1,6 +1,7 @@
 "use client";
 
 import React, {useEffect} from "react";
+import { RefObject } from "react";
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatMessage from "@/components/chat/ChatMessage";
 import ChatInput from "@/components/chat/ChatInput";
@@ -10,9 +11,14 @@ import {fetchMessages, selectCurrentConversation, selectMessages} from "@/redux/
 import {selectUser} from "@/redux/userSlice";
 import {MessageType, UserDataType} from "@/utils/types";
 import {AppDispatch} from "@/redux/store";
+
 import {formatDate} from "@/utils/helpers";
 
-function ChatWindow() {
+type ChatWindowProps = {
+  ws: RefObject<WebSocket | null>;
+};
+
+function ChatWindow({ ws }: ChatWindowProps) {
     const darkMode = useSelector(selectDarkMode);
     const messages: MessageType[] = useSelector(selectMessages);
     const user: UserDataType | null = useSelector(selectUser);
@@ -61,7 +67,7 @@ function ChatWindow() {
                     }
                 </div>
             </div>
-            <ChatInput/>
+            <ChatInput socketRef={ws}/>
         </div>
     );
 }

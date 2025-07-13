@@ -2,16 +2,75 @@
 import React from "react";
 import ConversationList from "@/components/conversation/ConversationList";
 import ChatWindow from "@/components/chat/ChatWindow";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {selectDarkMode} from "@/redux/uiSlice";
 import Sidebar from "@/components/SideBar";
 import ProfileCard from "@/components/ProfieCard";
 import AddContact from "@/components/conversation/AddContact";
+import {
+    addMessage,
+    deleteMessage,
+    fetchConversations,
+    fetchMessages,
+    selectCurrentConversation
+} from "@/redux/conversationSlice";
+import {ACCESS_TOKEN} from "@/utils/constant";
+import {AppDispatch} from "@/redux/store";
+
+const websocketUrl: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
 
 function Page() {
     const darkMode = useSelector(selectDarkMode);
     const [pageToRender, setPageToRender] = React.useState<string>('conversationList');
+    const token = sessionStorage.getItem(ACCESS_TOKEN);
+    const socketRef = React.useRef<WebSocket | null>(null);
+    const dispatch: AppDispatch = useDispatch();
+    const currentConversation = useSelector(selectCurrentConversation) || {id: 9999}
 
+   React.useEffect(() => {
+        if (!token) {
+            return;
+        }
+
+        const ws = new WebSocket(`${websocketUrl}chat/${currentConversation.id}?token=${token}`, "chat");
+        socketRef.current = ws;
+
+        ws.onopen = () => {
+            console.log("WebSocket connected");
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === "new_message") {
+                dispatch(addMessage(data.new_message_data));
+                dispatch(fetchConversations());
+            }
+
+            if (data.type === "new_conversation") {
+                dispatch(fetchConversations());
+            }
+
+            if (data.type === "supprimer_message") {
+                dispatch(deleteMessage(data.message_id))
+            }
+
+            if (data.type === "reaction") {
+                dispatch(fetchMessages(currentConversation.id))
+            }
+        };
+
+        ws.onclose = () => {
+            console.log("WebSocket closed");
+        };
+
+        ws.onerror = (error) => {
+            console.log("WebSocket error:", error);
+        };
+
+        return () => {
+            ws.close();
+        };
+    }, [currentConversation?.id, token, dispatch]);
 
     return (
         <main
@@ -23,7 +82,7 @@ function Page() {
                 {pageToRender === 'addContact' && <AddContact setPageToRender={setPageToRender}/>}
             </div>
             <div className={`hidden md:flex flex-col w-2/3 lg:w-3/4`}>
-                <ChatWindow/>
+                <ChatWindow ws={socketRef} />
             </div>
         </main>
     );

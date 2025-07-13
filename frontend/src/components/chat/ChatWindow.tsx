@@ -25,9 +25,9 @@ function ChatWindow({ ws }: ChatWindowProps) {
     const currentConversation = useSelector(selectCurrentConversation);
     const dispatch: AppDispatch = useDispatch();
     useEffect(() => {
-        if (messages.length !== 0 || !currentConversation?.id) return;
+        if (!currentConversation?.id) return;
         dispatch(fetchMessages(currentConversation.id))
-    }, [currentConversation?.id, dispatch, messages.length]);
+    }, [currentConversation?.id, dispatch]);
 
     if (!currentConversation) {
         return (
@@ -62,7 +62,8 @@ function ChatWindow({ ws }: ChatWindowProps) {
                                                 type={message.type}
                                                 reactionProp={message.reaction}
                                                 id={message.id}
-                                                sent={message.sender_id === user?.id}/>
+                                                sent={message.sender_id === user?.id}
+                            />
                         })
                     }
                 </div>

@@ -17,7 +17,7 @@ function ChatInput({socketRef}: ChatWindowProps) {
     const currentConversation = useSelector(selectCurrentConversation);
     const sendMessage = () => {
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN && newMessage.trim()) {
-            socketRef.current.send(JSON.stringify({content: newMessage, type: "text", receiver_id: currentConversation?.friend.id}));
+            socketRef.current.send(JSON.stringify({message_text: newMessage, type: "message", receiver_id: currentConversation?.friend.id}));
             setNewMessage("");
         }
     };
@@ -27,13 +27,19 @@ function ChatInput({socketRef}: ChatWindowProps) {
         if (file) {
             const reader = new FileReader();
             reader.onload = () => {
-                const arrayBuffer = reader.result as ArrayBuffer;
+                const base64 = reader.result as string;
                 if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-                    socketRef.current.send(arrayBuffer);
+                    socketRef.current.send(
+                        JSON.stringify({
+                            photo: base64,
+                            type: "message",
+                            receiver_id: currentConversation?.friend.id,
+                        })
+                    );
                 }
             };
 
-            reader.readAsArrayBuffer(file);
+            reader.readAsDataURL(file);
         }
     };
 

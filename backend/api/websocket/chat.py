@@ -1,10 +1,11 @@
+import base64
 import json
 import os
+import re
 
 from datetime import datetime
 
 from fastapi import APIRouter, WebSocket
-from sqlmodel import select
 from starlette.websockets import WebSocketDisconnect
 
 from backend.api.database.models import Message, User
@@ -25,9 +26,8 @@ def is_user_connected(discussion_id: int, user_id: int) -> bool:
 
 
 async def handle_text_message(
-    session: AsyncSessionDep, conversation_id: int, user: User, data: dict
+    session: AsyncSessionDep, conversation_id: int, user: User, content: str
 ):
-    content = data.get("content")
     new_message = Message(
         conversation_id=conversation_id,
         sender_id=user.id,
@@ -40,14 +40,25 @@ async def handle_text_message(
     return new_message
 
 
-async def handle_binary_message(
-    session: AsyncSessionDep, conversation_id: int, user: User, message_bytes: bytes
+async def handle_base64_photo_message(
+    session: AsyncSessionDep,
+    conversation_id: int,
+    user: User,
+    base64_string: str,
 ):
     try:
-        filename = f"{user.id}_{int(datetime.now().timestamp())}.jpg"
+        header, encoded = base64_string.split(",", 1)
+        file_ext = "jpg"
+        match = re.search(r"data:image/(\w+);base64", header)
+        if match:
+            file_ext = match.group(1)
+
+        image_data = base64.b64decode(encoded)
+
+        filename = f"{user.id}_{int(datetime.now().timestamp())}.{file_ext}"
         path = f"static/uploads/messages/{filename}"
         with open(path, "wb") as f:
-            f.write(message_bytes)
+            f.write(image_data)
 
         new_message = Message(
             conversation_id=conversation_id,
@@ -58,9 +69,11 @@ async def handle_binary_message(
         session.add(new_message)
         await session.commit()
         await session.refresh(new_message)
+
         return new_message
+
     except Exception as e:
-        print(f"Error processing image message: {e}")
+        print(f"Error processing base64 photo message: {e}")
         return None
 
 
@@ -92,11 +105,22 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
             if "text" in message:
                 data = json.loads(message["text"])
 
-                # envoie text: Message
-                if data.get("type") == "text":
-                    new_message = await handle_text_message(
-                        session, conversation_id, user, data
-                    )
+                if data.get("type") == "message":
+
+                    new_message = None
+                    # Envoi text: Message
+                    if "message_text" in data:
+                        content = data.get("message_text")
+                        new_message = await handle_text_message(
+                            session, conversation_id, user, content
+                        )
+
+                    # Envoi photo: Message
+                    if "photo" in data:
+                        base64image = data.get("photo")
+                        new_message = await handle_base64_photo_message(
+                            session, conversation_id, user, base64image
+                        )
 
                     for ws, _ in active_connections_in_discussion[conversation_id]:
                         await ws.send_json(
@@ -116,6 +140,7 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
                                     "type": "new_conversation",
                                 }
                             )
+
                 # text: supprimer un message
                 elif data.get("type") == "supprimer_message":
                     message_id = data.get("message_id")
@@ -146,7 +171,7 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
 
             # Envoi photo
             elif "bytes" in message and message["bytes"]:
-                new_message = await handle_binary_message(
+                new_message = await handle_base64_photo_message(
                     session, conversation_id, user, message["bytes"]
                 )
 

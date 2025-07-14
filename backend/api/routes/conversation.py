@@ -63,9 +63,9 @@ async def get_conversations(session: AsyncSessionDep, current_user: CurrUserDep)
 
 @router.delete("/conversation/{conversation_id}", status_code=204)
 async def delete_conversation(
-        conversation_id: int,
-        session: AsyncSessionDep,
-        current_user: CurrUserDep,
+    conversation_id: int,
+    session: AsyncSessionDep,
+    current_user: CurrUserDep,
 ):
     conversations = await session.exec(
         select(Conversation).where(Conversation.id == conversation_id)
@@ -92,12 +92,26 @@ async def get_messages(id: int, session: AsyncSessionDep):
 
 @router.post("/conversation", response_model=ConversationResponse, status_code=201)
 async def create_conversation(
-        session: AsyncSessionDep, current_user: CurrUserDep, data: FriendCreate
+    session: AsyncSessionDep, current_user: CurrUserDep, data: FriendCreate
 ):
     friend = await session.exec(select(User).where(User.username == data.username))
     friend = friend.first()
     if not friend:
         raise HTTPException(status_code=404, detail="Ce nom d'utilisateur n'existe pas")
+    existing_conversation = await session.exec(
+        select(Conversation).where(
+            (Conversation.user1_id == current_user["id"])
+            & (Conversation.user2_id == friend.id)
+        )
+    )
+
+    existing_conversation = existing_conversation.first()
+    if existing_conversation:
+        raise HTTPException(
+            status_code=400,
+            detail="Vous avez déjà une conversation avec cet utilisateur. Continuez à la discussion",
+        )
+
     user_id = current_user["id"]
     conversation = Conversation(user1_id=user_id, user2_id=friend.id)
     session.add(conversation)

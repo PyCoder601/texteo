@@ -6,7 +6,7 @@ import {UserPlus, ArrowLeft} from 'lucide-react';
 import api from "@/service/api";
 import axios from "axios";
 import {AppDispatch} from "@/redux/store";
-import {setConversations, setCurrentConversation} from "@/redux/conversationSlice";
+import {fetchConversations, setCurrentConversation} from "@/redux/conversationSlice";
 
 
 function AddContact({setPageToRender}: { setPageToRender: (page: string) => void }) {
@@ -21,7 +21,7 @@ function AddContact({setPageToRender}: { setPageToRender: (page: string) => void
                 username
             })
             dispatch(setCurrentConversation(response.data))
-            dispatch(setConversations([response.data]))
+            dispatch(fetchConversations())
             setPageToRender('conversationList')
         } catch (err) {
             if (axios.isAxiosError(err)) {
@@ -30,7 +30,6 @@ function AddContact({setPageToRender}: { setPageToRender: (page: string) => void
                 setError("Erreur réseau ou serveur")
             }
         }
-
 
     }
 

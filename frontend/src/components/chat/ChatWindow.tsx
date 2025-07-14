@@ -42,7 +42,7 @@ function ChatWindow({ ws }: ChatWindowProps) {
                 <div
                     className={`mt-8 border-t w-1/2 mx-auto ${darkMode ? "border-gray-700" : "border-gray-300"}`}></div>
                 <p className="mt-4 text-sm text-gray-500">
-                    Envoyez et recevez des messages en temps réel.
+                    Envoyez et recevez des messages en temps réel
                 </p>
             </div>
         )

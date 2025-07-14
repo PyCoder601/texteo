@@ -4,7 +4,7 @@ import {ACCESS_TOKEN} from "@/utils/constant";
 import {setUser, logoutUser} from "@/redux/userSlice";
 import api from "@/service/api";
 import {LoginDataType, RegisterDataType} from "@/utils/types";
-import {fetchConversations} from "@/redux/conversationSlice";
+import {fetchConversations, setConversationsAndMessageNull} from "@/redux/conversationSlice";
 
 export default async function authenticate(data: RegisterDataType | LoginDataType, type: 'login' | 'register') {
     try {
@@ -25,5 +25,7 @@ export default async function authenticate(data: RegisterDataType | LoginDataTyp
 export async function logout() {
     await api.post('/logout/');
     sessionStorage.removeItem(ACCESS_TOKEN);
+    window.location.href = '/';
     store.dispatch(logoutUser());
+    store.dispatch(setConversationsAndMessageNull({messages: [], conversations: []}))
 }

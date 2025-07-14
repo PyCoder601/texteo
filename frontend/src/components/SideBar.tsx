@@ -1,12 +1,13 @@
 import Img from 'next/image'
 import {selectDarkMode, toggleDarkMode} from "@/redux/uiSlice";
-import {Moon, Sun, MessageSquare, MessageSquareDiff} from "lucide-react";
+import {Moon, Sun, MessageSquare, MessageSquareDiff, Power} from "lucide-react";
 import {motion} from "framer-motion";
 import React from "react";
 import {AppDispatch} from "@/redux/store";
 import {useDispatch, useSelector} from "react-redux";
 import {selectUser} from "@/redux/userSlice";
 import {UserDataType} from "@/utils/types";
+import {logout} from "@/service/auth";
 
 export default function Sidebar({setPageToRender}: { setPageToRender: (page: string) => void }) {
     const user: UserDataType | null = useSelector(selectUser)
@@ -39,6 +40,15 @@ export default function Sidebar({setPageToRender}: { setPageToRender: (page: str
                     whileTap={{scale: 0.9}}
                 >
                     {darkMode ? <Sun size={20}/> : <Moon size={20}/>}
+                </motion.button>
+
+            </div>
+            <div className="flex flex-col items-center space-y-4">
+                <motion.button
+                    onClick={logout}
+                >
+                <Power size={32} className={"text-gray-500 hover:text-gray-800 " +
+                    "cursor-pointer transition-all duration-200 "} />
                 </motion.button>
             </div>
         </div>

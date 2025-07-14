@@ -182,3 +182,13 @@ async def update_me(
     await session.refresh(user)
 
     return user.to_dict()
+
+
+@router.post("/logout")
+async def logout(request: Request):
+    res = JSONResponse(
+        {
+            "message": "Logged out",
+        }
+    )
+    res.delete_cookie(key="refresh_token")

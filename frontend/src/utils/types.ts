@@ -37,7 +37,7 @@ export interface MessageType {
     id: number;
     sender_id: number;
     content: string;
-    type: "text" | "photo";
+    type: "text" | "photo" | "deleted";
     reaction: string | null;
     created_at: string;
 }

@@ -28,7 +28,7 @@ function ChatWindow({ ws }: ChatWindowProps) {
         if (!currentConversation?.id) return;
         dispatch(fetchMessages(currentConversation.id))
     }, [currentConversation?.id, dispatch]);
-
+    console.log(messages)
     if (!currentConversation) {
         return (
             <div
@@ -63,6 +63,7 @@ function ChatWindow({ ws }: ChatWindowProps) {
                                                 reactionProp={message.reaction}
                                                 id={message.id}
                                                 sent={message.sender_id === user?.id}
+                                                socketRef={ws}
                             />
                         })
                     }

@@ -146,12 +146,16 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
                     message_id = data.get("message_id")
                     message = await session.get(Message, message_id)
 
-                    await session.delete(message)
+                    message.type = "deleted"
                     await session.commit()
+                    await session.refresh(message)
 
                     for ws, _ in active_connections_in_discussion[conversation_id]:
                         await ws.send_json(
-                            {"message_id": message_id, "type": "supprimer_message"}
+                            {
+                                "message_data": message.to_dict(),
+                                "type": "supprimer_message",
+                            }
                         )
 
                 # text: reaction
@@ -168,24 +172,6 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
                         await ws.send_json(
                             {"message_data": message.to_dict(), "type": "reaction"}
                         )
-
-            # Envoi photo
-            elif "bytes" in message and message["bytes"]:
-                new_message = await handle_base64_photo_message(
-                    session, conversation_id, user, message["bytes"]
-                )
-
-                for ws, _ in active_connections_in_discussion[conversation_id]:
-                    await ws.send_json(
-                        {
-                            "new_message_data": new_message.to_dict(),
-                            "type": "new_message",
-                        }
-                    )
-
-            else:
-                print("Unsupported message type or empty payload.")
-                continue
 
     except WebSocketDisconnect:
         pass

@@ -9,10 +9,9 @@ import ProfileCard from "@/components/ProfieCard";
 import AddContact from "@/components/conversation/AddContact";
 import {
     addMessage,
-    deleteMessage,
+    setMessage,
     fetchConversations,
-    fetchMessages,
-    selectCurrentConversation
+    selectCurrentConversation,
 } from "@/redux/conversationSlice";
 import {ACCESS_TOKEN} from "@/utils/constant";
 import {AppDispatch} from "@/redux/store";
@@ -51,11 +50,11 @@ function Page() {
             }
 
             if (data.type === "supprimer_message") {
-                dispatch(deleteMessage(data.message_id))
+                dispatch(setMessage(data.message_data))
             }
 
             if (data.type === "reaction") {
-                dispatch(fetchMessages(currentConversation.id))
+                dispatch(setMessage(data.message_data))
             }
         };
 

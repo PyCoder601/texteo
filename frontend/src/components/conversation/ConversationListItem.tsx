@@ -2,7 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import {useDispatch, useSelector} from "react-redux";
-import {selectDarkMode} from "@/redux/uiSlice";
+import {selectDarkMode, setShowContactInfo} from "@/redux/uiSlice";
 import {ConversationDataType} from "@/utils/types";
 import {AppDispatch} from "@/redux/store";
 import {setCurrentConversation} from "@/redux/conversationSlice";
@@ -12,8 +12,12 @@ function ConversationListItem({conversation}: { conversation: ConversationDataTy
     const darkMode: boolean = useSelector(selectDarkMode);
     const {last_message, friend} = conversation
     const dispatch: AppDispatch = useDispatch();
+    const handleClick = () => {
+        dispatch(setCurrentConversation(conversation));
+        dispatch(setShowContactInfo(false));
+    }
     return (
-        <div onClick={() => dispatch(setCurrentConversation(conversation))}
+        <div onClick={handleClick}
              className={`flex items-center p-3 cursor-pointer ${darkMode ? "hover:bg-slate-700/50" : "hover:bg-gray-100"} transition-colors duration-200`}>
             {friend.avatar_url && !friend.avatar_url.includes("None") ?
                 <Image

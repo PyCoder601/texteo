@@ -3,7 +3,7 @@ import React from "react";
 import ConversationList from "@/components/conversation/ConversationList";
 import ChatWindow from "@/components/chat/ChatWindow";
 import {useDispatch, useSelector} from "react-redux";
-import {selectDarkMode} from "@/redux/uiSlice";
+import {selectDarkMode, selectShowContactInfo} from "@/redux/uiSlice";
 import Sidebar from "@/components/SideBar";
 import ProfileCard from "@/components/ProfieCard";
 import AddContact from "@/components/conversation/AddContact";
@@ -15,11 +15,13 @@ import {
 } from "@/redux/conversationSlice";
 import {ACCESS_TOKEN} from "@/utils/constant";
 import {AppDispatch} from "@/redux/store";
+import ContactInfo from "@/components/chat/ContactInfo";
 
 const websocketUrl: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
 
 function Page() {
     const darkMode = useSelector(selectDarkMode);
+    const showContactInfo = useSelector(selectShowContactInfo)
     const [pageToRender, setPageToRender] = React.useState<string>('conversationList');
     const token = sessionStorage.getItem(ACCESS_TOKEN);
     const socketRef = React.useRef<WebSocket | null>(null);
@@ -81,7 +83,7 @@ function Page() {
                 {pageToRender === 'addContact' && <AddContact setPageToRender={setPageToRender}/>}
             </div>
             <div className={`hidden md:flex flex-col w-2/3 lg:w-3/4`}>
-                <ChatWindow ws={socketRef} />
+                {showContactInfo ? <ContactInfo/> : <ChatWindow ws={socketRef}/>}
             </div>
         </main>
     );

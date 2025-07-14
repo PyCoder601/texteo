@@ -28,7 +28,6 @@ function ChatWindow({ ws }: ChatWindowProps) {
         if (!currentConversation?.id) return;
         dispatch(fetchMessages(currentConversation.id))
     }, [currentConversation?.id, dispatch]);
-    console.log(messages)
     if (!currentConversation) {
         return (
             <div

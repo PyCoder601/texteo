@@ -58,7 +58,7 @@ function ChatMessage({text, time, sent, type, id, reactionProp, socketRef}: Chat
     }
 
         return (
-            <div className={`flex group ${sent ? "justify-end" : "justify-start"} relative`}
+            <div className={`flex group ${sent ? "justify-end" : "justify-start"} relative z-0`}
                  onClick={(e) => {
                      if (e.target === e.currentTarget) {
                          dispatch(setToShowReactions(null))

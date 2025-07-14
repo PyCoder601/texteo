@@ -2,6 +2,7 @@ export interface UIType {
     darkMode: boolean;
     toShowOptions: number | null
     toShowReactions: number | null
+    showContactInfo: boolean
 }
 
 export interface LoginDataType {

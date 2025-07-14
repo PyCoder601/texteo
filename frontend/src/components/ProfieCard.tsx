@@ -70,9 +70,9 @@ function ProfileCard() {
 
     return (
         <div
-            className={`min-h-screen flex items-center justify-center p-4 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"}`}>
+            className={`min-h-screen flex items-center justify-center p-4`}>
             <div
-                className={`rounded-2xl p-6 w-full max-w-md space-y-6 shadow-2xl ${darkMode ? "bg-gray-800" : "bg-white"}`}>
+                className={`rounded-2xl p-6 w-full max-w-md space-y-6`}>
                 <h2 className="text-2xl font-bold text-center">Profile</h2>
 
                 <div className="flex justify-center">

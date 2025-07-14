@@ -138,7 +138,7 @@ async def refresh_token_func(request: Request):
     return response
 
 
-@router.get("/user/{user_id]", response_model=UserResponse)
+@router.get("/user/{user_id}", response_model=UserBase)
 async def get_me(session: AsyncSessionDep, current_user: CurrUserDep, user_id: int):
     user = await session.get(User, user_id)
     if not user:

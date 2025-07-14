@@ -47,17 +47,11 @@ const conversationSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchConversations.pending, (state) => {
-                state.conversations = []
-            })
             .addCase(fetchConversations.fulfilled, (state, action) => {
                 state.conversations = action.payload
             })
             .addCase(fetchConversations.rejected, (state) => {
                 state.conversations = []
-            })
-            .addCase(fetchMessages.pending, (state) => {
-                state.messages = []
             })
             .addCase(fetchMessages.fulfilled, (state, action) => {
                 state.messages = action.payload

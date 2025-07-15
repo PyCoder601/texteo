@@ -58,7 +58,7 @@ function ChatMessage({text, time, sent, type, id, reactionProp, socketRef}: Chat
     }
 
         return (
-            <div className={`flex group ${sent ? "justify-end" : "justify-start"} relative z-0`}
+            <div className={`flex group ${sent ? "justify-end" : "justify-start"} relative`}
                  onClick={(e) => {
                      if (e.target === e.currentTarget) {
                          dispatch(setToShowReactions(null))
@@ -110,9 +110,9 @@ function ChatMessage({text, time, sent, type, id, reactionProp, socketRef}: Chat
                                         const isSur = confirm("Ce message sera supprimer pour tout le monde")
                                         if (isSur) {
                                             handleDeleteMessage().catch(() => alert("Impossible de supprimer le message"))
+                                            dispatch(setToShowReactions(null))
+                                            dispatch(setToShowOptions(null))
                                         }
-                                        dispatch(setToShowReactions(null))
-                                        dispatch(setToShowOptions(null))
                                     }}
                                         className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer flex items-center text-red-500">
                                         <Trash2 size={18} className="mr-2"/> Supprimer

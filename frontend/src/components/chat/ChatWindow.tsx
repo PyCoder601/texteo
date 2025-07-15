@@ -50,7 +50,7 @@ function ChatWindow({ ws }: ChatWindowProps) {
     return (
         <div
             className={`flex flex-col h-full w-full ${darkMode ? "bg-gradient-to-br from-slate-900 to-gray-800" : "bg-gradient-to-br from-gray-50 to-blue-50"}`}>
-            <ChatHeader/>
+            <ChatHeader socketRef={ws}/>
             <div className="flex-1 overflow-y-auto p-6 bg-cover bg-center"
                  style={{backgroundImage: darkMode ? "url('/path-to-dark-whatsapp-bg.png')" : "url('/path-to-light-whatsapp-bg.png')"}}>
                 <div className="space-y-4">

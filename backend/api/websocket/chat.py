@@ -8,7 +8,7 @@ from datetime import datetime
 from fastapi import APIRouter, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
-from backend.api.database.models import Message, User
+from backend.api.database.models import Message, User, Conversation
 from backend.api.utils.deps import get_current_user, AsyncSessionDep
 
 router = APIRouter()
@@ -157,6 +157,36 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
                                 "type": "supprimer_message",
                             }
                         )
+
+                # text: supprimer conversation
+                elif data.get("type") == "supprimer_conversation":
+                    conversation_id_params = data.get("conversation_id")
+
+                    conversation = await session.get(
+                        Conversation, conversation_id_params
+                    )
+
+                    await session.delete(conversation)
+                    await session.commit()
+
+                    for ws, _ in active_connections_in_discussion[conversation_id]:
+                        await ws.send_json(
+                            {
+                                "type": "supprimer_conversation",
+                                "conversation_id": conversation_id_params,
+                            }
+                        )
+
+                    receiver_id = data.get("receiver_id")
+                    if not is_user_connected(conversation_id, receiver_id):
+                        ws = online_users.get(receiver_id)
+                        if ws:
+                            await ws.send_json(
+                                {
+                                    "type": "supprimer_conversation",
+                                    "conversation_id": conversation_id_params,
+                                }
+                            )
 
                 # text: reaction
                 else:

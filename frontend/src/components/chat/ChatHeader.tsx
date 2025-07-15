@@ -1,5 +1,5 @@
 "use client";
-import React, {useState, useRef, useEffect} from "react";
+import React, {useState, useRef, useEffect, RefObject} from "react";
 import {MoreVertical} from "lucide-react";
 import {useDispatch, useSelector} from "react-redux";
 import {selectDarkMode, setShowContactInfo} from "@/redux/uiSlice";
@@ -7,7 +7,11 @@ import {selectCurrentConversation} from "@/redux/conversationSlice";
 import Image from "next/image";
 import {AppDispatch} from "@/redux/store";
 
-function ChatHeader() {
+type ChatHeaderProps = {
+    socketRef: RefObject<WebSocket | null>;
+};
+
+function ChatHeader({socketRef}: ChatHeaderProps) {
     const darkMode: boolean = useSelector(selectDarkMode);
     const currentConversation = useSelector(selectCurrentConversation);
     const {friend} = currentConversation || {};
@@ -24,6 +28,16 @@ function ChatHeader() {
             setDropdownOpen(false);
         }
     };
+
+    const handleDeleteConversation = async () => {
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({
+                conversation_id: currentConversation?.id,
+                type: "supprimer_conversation",
+                receiver_id: friend?.id,
+            }));
+        }
+    }
 
     useEffect(() => {
         document.addEventListener("mousedown", handleClickOutside);
@@ -74,6 +88,12 @@ function ChatHeader() {
                             </li>
                             <li>
                                 <button
+                                    onClick={() => {
+                                        const isSur = confirm("Supprimer la discussion")
+                                        if (isSur) {
+                                            handleDeleteConversation()
+                                        }
+                                    }}
                                     className={`block px-4 py-2 text-sm ${darkMode ? "hover:bg-slate-700" : "hover:bg-gray-100"} text-red-500`}>
                                     Supprimer la discussion
                                 </button>

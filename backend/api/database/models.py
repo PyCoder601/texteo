@@ -63,7 +63,10 @@ class Conversation(SQLModel, table=True):
             "lazy": "joined",
         },
     )
-    messages: list["Message"] = Relationship(back_populates="conversation")
+    messages: list["Message"] = Relationship(
+        back_populates="conversation",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
+    )
 
 
 # ---------------------
@@ -71,7 +74,7 @@ class Conversation(SQLModel, table=True):
 # ---------------------
 class Message(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    conversation_id: int = Field(foreign_key="conversation.id")
+    conversation_id: int = Field(foreign_key="conversation.id", ondelete="CASCADE")
     sender_id: int = Field(foreign_key="user.id")
     type: str = Field(default="text")
     content: str

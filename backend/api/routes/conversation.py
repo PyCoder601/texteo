@@ -61,25 +61,6 @@ async def get_conversations(session: AsyncSessionDep, current_user: CurrUserDep)
     return responses
 
 
-@router.delete("/conversation/{conversation_id}", status_code=204)
-async def delete_conversation(
-    conversation_id: int,
-    session: AsyncSessionDep,
-    current_user: CurrUserDep,
-):
-    conversations = await session.exec(
-        select(Conversation).where(Conversation.id == conversation_id)
-    )
-    conversation = conversations.first()
-    if not conversation:
-        raise HTTPException(status_code=404, detail="Conversation not found")
-    await session.delete(conversation)
-    await session.commit()
-    return JSONResponse(
-        {"message": "Conversation deleted successfully"}, status_code=204
-    )
-
-
 @router.get("/conversations/{id}/messages", response_model=list[MessageResponse])
 async def get_messages(id: int, session: AsyncSessionDep):
     result = await session.exec(

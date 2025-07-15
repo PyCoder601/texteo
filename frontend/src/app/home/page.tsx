@@ -11,7 +11,7 @@ import {
     addMessage,
     setMessage,
     fetchConversations,
-    selectCurrentConversation,
+    selectCurrentConversation, setCurrentConversation, deleteConversation,
 } from "@/redux/conversationSlice";
 import {ACCESS_TOKEN} from "@/utils/constant";
 import {AppDispatch} from "@/redux/store";
@@ -57,6 +57,11 @@ function Page() {
 
             if (data.type === "reaction") {
                 dispatch(setMessage(data.message_data))
+            }
+
+            if (data.type === "supprimer_conversation") {
+                dispatch(deleteConversation(data.conversation_id))
+
             }
         };
 

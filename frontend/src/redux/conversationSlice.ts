@@ -36,13 +36,23 @@ const conversationSlice = createSlice({
         setCurrentConversation: (state, action) => {
             state.currentConversation = action.payload;
         },
+        deleteConversation: (state, action) => {
+            const index = state.conversations.findIndex(conversation =>
+                conversation.id === action.payload);
+            if (index !== -1) {
+                state.conversations.splice(index, 1);
+            }
+            if (state.currentConversation?.id === action.payload) {
+                state.currentConversation = null;
+                state.messages = [];
+            }
+        },
         addMessage: (state, action) => {
             state.messages.push(action.payload);
         },
         setMessage: (state, action) => {
         state.messages = state.messages.map(msg =>
-        msg.id === action.payload.id ? action.payload : msg
-        );
+            msg.id === action.payload.id ? action.payload : msg);
         }
     },
     extraReducers: (builder) => {
@@ -63,7 +73,8 @@ const conversationSlice = createSlice({
 })
 
 export const {setCurrentConversation, setConversationsAndMessageNull,
-    addMessage, setMessage} = conversationSlice.actions;
+    addMessage, setMessage, deleteConversation
+} = conversationSlice.actions;
 export default conversationSlice.reducer;
 
 export const selectConversations = (state:

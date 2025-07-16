@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Request, Form, UploadFile
+
 from sqlmodel import select
 from starlette.responses import JSONResponse
 
@@ -15,15 +16,18 @@ from backend.api.database.schemas import (
     RegisterSchema,
     UserBase,
 )
+
 from backend.api.utils.deps import AsyncSessionDep, CurrUserDep
 from backend.api.utils.jwt import (
     create_access_token,
     create_refresh_token,
     verify_token,
 )
-from backend.api.utils.password import verify_password, hash_password
+from backend.api.utils.helpers import verify_password, hash_password, set_is_online
 
 router = APIRouter()
+
+UPLOAD_FOLDER = "static/uploads/avatars"
 
 
 @router.post("/login", response_model=UserResponse)
@@ -35,7 +39,10 @@ async def login(session: AsyncSessionDep, data: LoginSchema):
         raise HTTPException(
             status_code=400, detail="Nom d'utilisateur ou mot de passe incorrecte"
         )
-    user_data = user.to_dict()
+
+    await set_is_online(user.id, True)
+
+    user_data = await user.to_dict()
     access_token = create_access_token(user_data)
     refresh_token = create_refresh_token(user_data)
 
@@ -53,6 +60,7 @@ async def login(session: AsyncSessionDep, data: LoginSchema):
         secure=True,
     )
 
+    print(f"user: {user_data}")
     return response
 
 
@@ -79,7 +87,9 @@ async def register(session: AsyncSessionDep, data: RegisterSchema):
     await session.commit()
     await session.refresh(new_user)
 
-    user_data = new_user.to_dict()
+    user_data = await new_user.to_dict()
+
+    await set_is_online(user_data["id"], True)
 
     access_token = create_access_token(user_data)
     refresh_token = create_refresh_token(user_data)
@@ -104,7 +114,9 @@ async def register(session: AsyncSessionDep, data: RegisterSchema):
 @router.post("/logout")
 async def logout(request: Request):
     response = JSONResponse({"message": "Logout successful"})
+    await set_is_online(request.user["id"], False)
     response.delete_cookie(key="refresh_token")
+
     return response
 
 
@@ -117,6 +129,8 @@ async def refresh_token_func(request: Request):
     payload = verify_token(refresh_token, token_type="refresh")
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    await set_is_online(payload["id"], True)
 
     access_token = create_access_token(payload)
     refresh_token = create_refresh_token(payload)
@@ -141,12 +155,13 @@ async def refresh_token_func(request: Request):
 @router.get("/user/{user_id}", response_model=UserBase)
 async def get_me(session: AsyncSessionDep, current_user: CurrUserDep, user_id: int):
     user = await session.get(User, user_id)
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return user.to_dict()
+    response = await user.to_dict()
+    print(f"user: {response}")
 
-
-UPLOAD_FOLDER = "static/uploads/avatars"
+    return response
 
 
 @router.patch("/me", response_model=UserBase)
@@ -158,6 +173,7 @@ async def update_me(
     profile_picture: Optional[UploadFile] = None,
 ):
     user = await session.get(User, current_user["id"])
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -181,14 +197,6 @@ async def update_me(
     await session.commit()
     await session.refresh(user)
 
-    return user.to_dict()
+    response = await user.to_dict()
 
-
-@router.post("/logout")
-async def logout(request: Request):
-    res = JSONResponse(
-        {
-            "message": "Logged out",
-        }
-    )
-    res.delete_cookie(key="refresh_token")
+    return response

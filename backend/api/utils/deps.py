@@ -6,6 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from backend.api.database.db import get_async_session
 from backend.api.database.models import User
+from backend.api.utils.helpers import set_is_online
 from backend.api.utils.jwt import verify_token
 
 AsyncSessionDep = Annotated[AsyncSession, Depends(get_async_session)]
@@ -15,6 +16,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     payload = verify_token(token, token_type="access")
+
+    await set_is_online(payload.get("id"), True)
+
     if not payload.get("id"):
         raise HTTPException(status_code=401, detail="Invalid token")
     payload.pop("type")

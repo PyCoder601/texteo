@@ -36,6 +36,8 @@ class UserBase(BaseModel):
     username: str
     email: EmailStr
     avatar_url: Optional[str] = None
+    is_online: bool
+    last_seen: Optional[str] = None
     bio: Optional[str] = None
 
 

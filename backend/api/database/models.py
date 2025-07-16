@@ -3,7 +3,8 @@ from typing import Optional
 
 from sqlmodel import SQLModel, Field, Relationship
 
-from backend.api.utils.get_avatar_url import avatar_url
+from backend.api.routes.redis import async_redis
+from backend.api.utils.helpers import avatar_url
 
 
 # ---------------------
@@ -28,15 +29,21 @@ class User(SQLModel, table=True):
         sa_relationship_kwargs={"foreign_keys": "[Conversation.user2_id]"},
     )
 
-    def to_dict(self):
+    async def to_dict(self):
         return {
             "id": self.id,
             "username": self.username,
             "email": self.email,
             "avatar_url": avatar_url(self.avatar_url),
             "bio": self.bio,
+            "is_online": await self.is_online(),
             "last_seen": self.last_seen.isoformat() if self.last_seen else None,
         }
+
+    async def is_online(self):
+        status = await async_redis.get(f"user:{self.id}:online")
+        print(f"user: {status}")
+        return status if status else False
 
 
 # ---------------------

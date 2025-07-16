@@ -9,11 +9,14 @@ from fastapi import APIRouter, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
 from backend.api.database.models import Message, User, Conversation
+from backend.api.routes.redis import async_redis
 from backend.api.utils.deps import get_current_user, AsyncSessionDep
+from backend.api.utils.helpers import set_is_online
 
-router = APIRouter()
 active_connections_in_discussion: dict[int, list[tuple[WebSocket, int]]] = {}
 online_users: dict[int, WebSocket] = {}
+
+router = APIRouter()
 
 
 UPLOAD_FOLDER = "static/uploads/messages"
@@ -85,6 +88,8 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
     user_dict = await get_current_user(token)
     user = await session.get(User, user_dict["id"])
 
+    await set_is_online(user.id, True)
+
     if not user:
         await websocket.close(code=4001)
         return
@@ -108,6 +113,7 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
                 if data.get("type") == "message":
 
                     new_message = None
+
                     # Envoi text: Message
                     if "message_text" in data:
                         content = data.get("message_text")
@@ -213,6 +219,6 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
             del active_connections_in_discussion[conversation_id]
 
         del online_users[user.id]
-        # await async_redis.set(f"user:{user.id}:online", 0)
+        await async_redis.set(f"user:{user.id}:online", 0)
         user.last_seen = datetime.now()
         await session.commit()

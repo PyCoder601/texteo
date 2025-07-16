@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
-from starlette.responses import JSONResponse
 from dotenv import load_dotenv
 
 from backend.api.database.models import Conversation, Message, User
@@ -10,8 +9,9 @@ from backend.api.database.schemas import (
     FriendResponse,
     FriendCreate,
 )
+
 from backend.api.utils.deps import AsyncSessionDep, CurrUserDep
-from backend.api.utils.get_avatar_url import avatar_url
+from backend.api.utils.helpers import avatar_url
 
 router = APIRouter()
 load_dotenv()
@@ -61,11 +61,13 @@ async def get_conversations(session: AsyncSessionDep, current_user: CurrUserDep)
     return responses
 
 
-@router.get("/conversations/{id}/messages", response_model=list[MessageResponse])
-async def get_messages(id: int, session: AsyncSessionDep):
+@router.get("/conversations/{id_conv}/messages", response_model=list[MessageResponse])
+async def get_messages(
+        id_conv: int, session: AsyncSessionDep, current_user: CurrUserDep
+):
     result = await session.exec(
         select(Message)
-        .where(Message.conversation_id == id)
+        .where(Message.conversation_id == id_conv)
         .order_by(Message.created_at)
     )
     return [message.to_dict() for message in result.all()]

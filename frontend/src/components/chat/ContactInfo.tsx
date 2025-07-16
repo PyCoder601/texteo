@@ -2,29 +2,16 @@
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {selectDarkMode, setShowContactInfo} from "@/redux/uiSlice";
-import {selectCurrentConversation} from "@/redux/conversationSlice";
 import Image from "next/image";
-import {UserDataType} from "@/utils/types";
 import {X} from "lucide-react";
 import {AppDispatch} from "@/redux/store";
-import api from "@/service/api";
+import {selectCurrFriend} from "@/redux/userSlice";
 
 function ContactInfo() {
     const darkMode: boolean = useSelector(selectDarkMode);
-    const currentConversation = useSelector(selectCurrentConversation);
     const dispatch: AppDispatch = useDispatch();
-    const [friend, setFriend] = React.useState<UserDataType | null>(null);
+    const friend = useSelector(selectCurrFriend)
 
-    React.useEffect(() => {
-        if (!currentConversation) return;
-
-        async function fetchFriend() {
-            const response = await api.get(`/user/${currentConversation?.friend.id}`);
-            setFriend(response.data);
-        }
-
-        fetchFriend().catch(() => console.log("error"));
-    }, [currentConversation])
 
     if (!friend) {
         return (

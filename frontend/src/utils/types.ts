@@ -21,11 +21,13 @@ export interface UserDataType {
     bio: string;
     avatar_url: string;
     last_seen: string | null;
+    is_online: boolean;
     created_at: string;
 }
 
 export interface UserState {
-    user: UserDataType | null
+    user: UserDataType | null;
+    currFriend: UserDataType | null;
 }
 
 export interface FriendType {

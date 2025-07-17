@@ -16,6 +16,7 @@ import {
 import {ACCESS_TOKEN} from "@/utils/constant";
 import {AppDispatch} from "@/redux/store";
 import ContactInfo from "@/components/chat/ContactInfo";
+import {setCurrFriendStatus} from "@/redux/userSlice";
 
 const websocketUrl: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
 
@@ -61,7 +62,19 @@ function Page() {
 
             if (data.type === "supprimer_conversation") {
                 dispatch(deleteConversation(data.conversation_id))
+            }
 
+            if (data.type === "friend_connected") {
+                dispatch(setCurrFriendStatus({
+                    status: true
+                }))
+            }
+
+            if (data.type === "friend_disconnected") {
+                dispatch(setCurrFriendStatus({
+                    last_seen: data.last_seen,
+                    status: false,
+                }))
             }
         };
 

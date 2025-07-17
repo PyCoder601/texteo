@@ -86,10 +86,27 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
     token = websocket.query_params.get("token")
 
     user_dict = await get_current_user(token)
+
     user = await session.get(User, user_dict["id"])
+    conversation = await session.get(Conversation, conversation_id)
+
+    if conversation:
+        friend_id = (
+            conversation.user2_id
+            if user.id == conversation.user1_id
+            else conversation.user1_id
+        )
+
+        print("first friend id", friend_id)
+        friend_ws = online_users.get(friend_id)
+        if friend_ws:
+            await friend_ws.send_json(
+                {
+                    "type": "friend_connected",
+                }
+            )
 
     await set_is_online(user.id, True)
-
     if not user:
         await websocket.close(code=4001)
         return
@@ -222,3 +239,23 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
         await async_redis.set(f"user:{user.id}:online", 0)
         user.last_seen = datetime.now()
         await session.commit()
+
+        conversation = await session.get(Conversation, conversation_id)
+
+        if not conversation:
+            return
+
+        friend_id = (
+            conversation.user2_id
+            if user.id == conversation.user1_id
+            else conversation.user1_id
+        )
+
+        friend_ws = online_users.get(friend_id)
+        if friend_ws:
+            await friend_ws.send_json(
+                {
+                    "type": "friend_disconnected",
+                    "last_seen": user.last_seen.isoformat(),
+                }
+            )

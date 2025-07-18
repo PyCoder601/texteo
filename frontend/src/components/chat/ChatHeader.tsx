@@ -93,13 +93,13 @@ function ChatHeader({socketRef}: ChatHeaderProps) {
                         </button>
                         {dropdownOpen && (
                             <div
-                                className={`absolute right-0 mt-2 w-48 ${darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"} 
+                                className={`absolute right-2 w-48 ${darkMode ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"} 
                         border rounded-md shadow-lg z-10`}>
                                 <ul className={`py-1 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>
                                     <li>
                                         <button
                                             onClick={() => dispatch(setShowContactInfo(true))}
-                                            className={`block px-4 py-2 text-sm ${darkMode ? "hover:bg-slate-700" : "hover:bg-gray-100"}`}>
+                                            className={`block px-4 py-2 w-full text-sm ${darkMode ? "hover:bg-slate-700" : "hover:bg-gray-100"}`}>
                                             Info du contact
                                         </button>
                                     </li>
@@ -111,7 +111,7 @@ function ChatHeader({socketRef}: ChatHeaderProps) {
                                                     handleDeleteConversation()
                                                 }
                                             }}
-                                            className={`block px-4 py-2 text-sm ${darkMode ? "hover:bg-slate-700" : "hover:bg-gray-100"} text-red-500`}>
+                                            className={`block px-4 py-2 w-full text-sm ${darkMode ? "hover:bg-slate-700" : "hover:bg-gray-100"} text-red-500`}>
                                             Supprimer la discussion
                                         </button>
                                     </li>

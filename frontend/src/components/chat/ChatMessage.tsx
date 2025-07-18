@@ -97,7 +97,7 @@ function ChatMessage({text, time, sent, type, id, reactionProp, socketRef}: Chat
                         )}
                         {toShowOptions === id && (
                             <div
-                                className={`absolute ${sent ? "right-full mr-2" : "left-full ml-2"} top-0 mt-8 w-40 bg-white dark:bg-slate-800 rounded-md shadow-lg z-10`}>
+                                className={`absolute ${sent ? "right-full mr-7" : "left-full ml-7"} bottom-1/5 mt-8 w-40 bg-white dark:bg-slate-800 rounded-md shadow-lg z-10`}>
                                 <ul>
                                     <li onClick={() => {
                                         dispatch(setToShowReactions(id));
@@ -123,7 +123,7 @@ function ChatMessage({text, time, sent, type, id, reactionProp, socketRef}: Chat
 
                         {toShowReactions === id && (
                             <div
-                                className={`absolute ${sent ? "right-0" : "left-0"} -top-10 flex space-x-2 bg-white dark:bg-slate-700 p-2 rounded-full shadow-lg`}>
+                                className={`absolute z-10 ${sent ? "right-0" : "left-0"} bottom-[-15px] flex space-x-2 bg-white dark:bg-slate-700 p-2 rounded-full shadow-lg`}>
                                 {reactions.map((r) => (
                                     <button key={r} onClick={() => handleSetReaction(r)}
                                             className="text-xl hover:scale-125 transition-transform">

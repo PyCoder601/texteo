@@ -13,7 +13,7 @@ const BarNav = [
     },
     {
         title: "A propos",
-        lien: "/confidentialite"
+        lien: "/a-propos"
     },
     {
         "title": "se connecter",
@@ -29,7 +29,7 @@ function Header() {
             className={`flex items-center justify-between p-6 sticky top-0 z-10`}
         >
             <motion.div
-                className={"text-3xl font-bold bg-clip-text text-transparent" +
+                className={"text-2xl sm:text-3xl font-bold bg-clip-text text-transparent" +
                     " bg-gradient-to-r from-teal-400 to-green-500"}
                 initial={{opacity: 0, y: -20}}
                 animate={{opacity: 1, y: 0}}
@@ -37,13 +37,15 @@ function Header() {
             >
                 <Link href="/">Texteo</Link>
             </motion.div>
-            <nav className="flex items-center space-x-6">
+            <nav className="flex items-center space-x-3 sm:space-x-6">
                 {BarNav.map(
                     (item, index) => (
                         <motion.a
                             key={item.title}
                             href={item.lien}
-                            className="hover:text-teal-400 transition-colors"
+                            className={`text-sm sm:text-base hover:text-teal-400  transition-colors
+                            ${item.lien === "/login" ? "hidden sm:block" : ""}
+                            `}
                             whileHover={{scale: 1.1}}
                             initial={{opacity: 0, y: -20}}
                             animate={{opacity: 1, y: 0}}

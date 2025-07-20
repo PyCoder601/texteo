@@ -11,7 +11,7 @@ import {
     addMessage,
     setMessage,
     fetchConversations,
-    selectCurrentConversation, setCurrentConversation, deleteConversation,
+    selectCurrentConversation, deleteConversation,
 } from "@/redux/conversationSlice";
 import {ACCESS_TOKEN} from "@/utils/constant";
 import {AppDispatch} from "@/redux/store";

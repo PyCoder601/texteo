@@ -114,7 +114,6 @@ async def register(session: AsyncSessionDep, data: RegisterSchema):
 @router.post("/logout")
 async def logout(request: Request):
     response = JSONResponse({"message": "Logout successful"})
-    await set_is_online(request.user["id"], False)
     response.delete_cookie(key="refresh_token")
 
     return response

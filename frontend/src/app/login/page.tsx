@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {motion} from "framer-motion";
 import {Lock, User} from "lucide-react";
 import Header from "@/ui/Header";
@@ -17,6 +17,17 @@ export default function LoginPage() {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
     const router = useRouter();
+
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkIsMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkIsMobile();
+        window.addEventListener("resize", checkIsMobile);
+        return () => window.removeEventListener("resize", checkIsMobile);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -41,7 +52,8 @@ export default function LoginPage() {
             } transition-colors duration-300`}
         >
             <Header/>
-            <section className="flex flex-col items-center justify-center px-8 py-20 max-w-7xl mx-auto flex-grow">
+            <section
+                className="flex flex-col items-center justify-center px-8 py-4 md:py-10 max-w-7xl mx-auto flex-grow">
                 <motion.div
                     className={`w-full max-w-md p-8 rounded-lg shadow-lg ${
                         darkMode ? "bg-[#202c33]" : "bg-white"
@@ -86,7 +98,7 @@ export default function LoginPage() {
                         </div>
                         <motion.button
                             type="submit"
-                            className={`w-full bg-gradient-to-r from-teal-500 to-green-600 " +
+                            className={`w-full ${isMobile ? "bg-teal-100" : "bg-gradient-to-r from-teal-500 to-green-600"} " +
                                 "text-white px-8 py-3 rounded-full font-semibold shadow-lg " +
                                 "hover:shadow-xl transform hover:scale-105 transition-all " +
                                 "duration-300 ${
@@ -120,7 +132,8 @@ export default function LoginPage() {
                                     </svg>
                                     connexion ...
                                 </div>
-                            ) : (
+                            ) : isMobile ? ("Passer sur un pc ☺️") :
+                                (
                                 'Se connecter'
                             )}
                         </motion.button>

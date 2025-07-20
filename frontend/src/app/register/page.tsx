@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {motion} from "framer-motion";
 import {Lock, User, Mail} from "lucide-react";
 import Header from "@/ui/Header";
@@ -18,6 +18,17 @@ export default function RegisterPage() {
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
     const router = useRouter();
+
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkIsMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkIsMobile();
+        window.addEventListener("resize", checkIsMobile);
+        return () => window.removeEventListener("resize", checkIsMobile);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -45,7 +56,7 @@ export default function RegisterPage() {
         >
             <Header/>
             <section className={"flex flex-col items-center justify-center px-8" +
-                " py-20 max-w-7xl mx-auto flex-grow"}>
+                " py-3 max-w-7xl mx-auto flex-grow"}>
                 <motion.div
                     className={`w-full max-w-md p-8 rounded-lg shadow-lg ${
                         darkMode ? "bg-[#202c33]" : "bg-white"
@@ -66,6 +77,7 @@ export default function RegisterPage() {
                             <input
                                 type="text"
                                 placeholder="Nom d'utilisateur"
+                                disabled={isMobile}
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 className={`w-full pl-12 pr-4 py-3 rounded-lg ${
@@ -80,6 +92,7 @@ export default function RegisterPage() {
                             <input
                                 type="email"
                                 placeholder="Email"
+                                disabled={isMobile}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className={`w-full pl-12 pr-4 py-3 rounded-lg ${
@@ -94,6 +107,7 @@ export default function RegisterPage() {
                             <input
                                 type="password"
                                 placeholder="Mot de passe"
+                                disabled={isMobile}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className={`w-full pl-12 pr-4 py-3 rounded-lg ${
@@ -105,8 +119,9 @@ export default function RegisterPage() {
                         </div>
                         <motion.button
                             type="submit"
-                            className={`w-full bg-gradient-to-r from-teal-500 to-green-600 " +
-                                "text-white px-8 py-3 rounded-full font-semibold shadow-lg " +
+                            disabled={isMobile}
+                            className={`w-full ${isMobile ? "bg-teal-100" : "bg-gradient-to-r from-teal-500 to-green-600"} " +
+                                "text-white px-8 py-1 md:py-3 rounded-full font-semibold shadow-lg " +
                                 "hover:shadow-xl transform hover:scale-105 transition-all " +
                                 "duration-300 ${
                                 loading
@@ -139,14 +154,15 @@ export default function RegisterPage() {
                                     </svg>
                                     création ...
                                 </div>
-                            ) : (
+                            ) : isMobile ? ("Passer à un pc ☺️") :
+                                (
                                 'Créer mon compte'
                             )}
                         </motion.button>
                     </form>
                     <p className={`text-center mt-6 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
                         Déjà un compte?{" "}
-                        <Link href="/login" className="text-teal-500 hover:underline">
+                        <Link href="/login" className={"text-teal-500 hover:underline"}>
                             Se connecter
                         </Link>
                     </p>

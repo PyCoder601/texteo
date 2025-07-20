@@ -9,6 +9,7 @@ import {
 import Image from 'next/image';
 import {Smile, MessageCircleMore, Trash2} from "lucide-react";
 import {AppDispatch} from "@/redux/store";
+import {selectCurrFriend} from "@/redux/userSlice";
 
 interface ChatMessageProps {
     text: string;
@@ -28,7 +29,8 @@ function ChatMessage({text, time, sent, type, id, reactionProp, socketRef}: Chat
     const toShowReactions: number | null = useSelector(selectShowReactions)
     const toShowOptions: number | null = useSelector(selectShowOptions)
     const dispatch: AppDispatch = useDispatch();
-    console.log(reactionProp, "reaction state: ", reaction)
+
+    const friend = useSelector(selectCurrFriend)
 
     const messageClass = sent
         ? `self-end ${darkMode ? "bg-gradient-to-br from-teal-800 to-green-800" : "bg-gradient-to-br from-green-100 to-teal-100"} shadow-md`
@@ -40,6 +42,7 @@ function ChatMessage({text, time, sent, type, id, reactionProp, socketRef}: Chat
             socketRef.current.send(JSON.stringify({
                 reaction: selectedReaction,
                 message_id: id,
+                receiver_id: friend?.id,
                 type: "reaction",
             }));
 

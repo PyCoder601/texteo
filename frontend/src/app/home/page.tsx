@@ -3,7 +3,7 @@ import React from "react";
 import ConversationList from "@/components/conversation/ConversationList";
 import ChatWindow from "@/components/chat/ChatWindow";
 import {useDispatch, useSelector} from "react-redux";
-import {selectDarkMode, selectShowContactInfo} from "@/redux/uiSlice";
+import {selectDarkMode, selectShowContactInfo, setNotification} from "@/redux/uiSlice";
 import Sidebar from "@/components/SideBar";
 import ProfileCard from "@/components/ProfieCard";
 import AddContact from "@/components/conversation/AddContact";
@@ -50,6 +50,11 @@ function Page() {
 
             if (data.type === "new_conversation") {
                 dispatch(fetchConversations());
+                dispatch(setNotification({
+                    type_event: "success",
+                    titre: "Nouveau message",
+                    message: `Vous avez un message venant de ${data.friend_name}`
+                }))
             }
 
             if (data.type === "supprimer_message") {
@@ -58,6 +63,14 @@ function Page() {
 
             if (data.type === "reaction") {
                 dispatch(setMessage(data.message_data))
+            }
+
+            if (data.type === "new_reaction") {
+                dispatch(setNotification({
+                    titre: "reaction",
+                    type_event: "success",
+                    message: `${data.friend_name} a réagi à un message`
+                }))
             }
 
             if (data.type === "supprimer_conversation") {

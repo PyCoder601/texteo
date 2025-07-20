@@ -161,6 +161,7 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
                             await ws.send_json(
                                 {
                                     "type": "new_conversation",
+                                    "friend_name": user.username,
                                 }
                             )
 
@@ -225,6 +226,18 @@ async def chat(websocket: WebSocket, conversation_id: int, session: AsyncSession
                         await ws.send_json(
                             {"message_data": message.to_dict(), "type": "reaction"}
                         )
+
+                    receiver_id = data.get("receiver_id")
+                    if not is_user_connected(conversation_id, receiver_id):
+                        print("receiver_id", receiver_id)
+                        ws = online_users.get(receiver_id)
+                        if ws:
+                            await ws.send_json(
+                                {
+                                    "type": "new_reaction",
+                                    "friend_name": user.username,
+                                }
+                            )
 
     except WebSocketDisconnect:
         pass

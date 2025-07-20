@@ -1,6 +1,7 @@
 import "./globals.css";
 import React from "react";
 import ReduxProvider from "@/redux/Provider";
+import MainContent from "./MainContent";
 
 export default function RootLayout({
                                        children,
@@ -15,10 +16,9 @@ export default function RootLayout({
             <link rel="icon" href="/logo-texteo.ico"/>
             <title>Texteo</title>
         </head>
-        <body
-        >
+        <body>
         <ReduxProvider>
-            {children}
+            <MainContent>{children}</MainContent>
         </ReduxProvider>
         </body>
         </html>

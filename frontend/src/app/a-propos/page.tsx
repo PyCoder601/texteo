@@ -37,11 +37,13 @@ export default function APropos() {
 
     return (
         <main
-            className={`flex flex-col min-h-screen ${darkMode ? "bg-gradient-to-br from-[#111b21] to-[#202c33] text-white" : "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800"} transition-colors duration-300`}
+            className={`flex flex-col min-h-screen ${darkMode ? "bg-gradient-to-br from-[#111b21] " +
+                "to-[#202c33] text-white" : "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800"} 
+                transition-colors duration-300`}
         >
             <Header/>
 
-            <section className="px-4 py-8 sm:px-6 sm:py-16 lg:px-8 lg:py-24 max-w-7xl mx-auto">
+            <section className="px-4 py-3 sm:px-6 sm:py-6 lg:px-8 lg:py-12 max-w-7xl mx-auto">
                 <motion.div
                     initial={{opacity: 0, y: -20}}
                     animate={{opacity: 1, y: 0}}

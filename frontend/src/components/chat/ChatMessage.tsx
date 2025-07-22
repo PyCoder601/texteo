@@ -25,19 +25,18 @@ const reactions: string[] = ["🤝", "😂", "❤️", "😱", "😮", "😡", "
 
 function ChatMessage({text, time, sent, type, id, reactionProp, socketRef}: ChatMessageProps) {
     const darkMode: boolean = useSelector(selectDarkMode);
-    const [reaction, setReaction] = React.useState<string | null>(reactionProp);
     const toShowReactions: number | null = useSelector(selectShowReactions)
     const toShowOptions: number | null = useSelector(selectShowOptions)
     const dispatch: AppDispatch = useDispatch();
 
     const friend = useSelector(selectCurrFriend)
 
+
     const messageClass = sent
         ? `self-end ${darkMode ? "bg-gradient-to-br from-teal-800 to-green-800" : "bg-gradient-to-br from-green-100 to-teal-100"} shadow-md`
         : `self-start ${darkMode ? "bg-slate-700" : "bg-white"} shadow-md`;
 
     const handleSetReaction = (selectedReaction: string) => {
-        setReaction(selectedReaction);
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
             socketRef.current.send(JSON.stringify({
                 reaction: selectedReaction,

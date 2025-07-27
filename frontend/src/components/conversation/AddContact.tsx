@@ -14,8 +14,11 @@ function AddContact({setPageToRender}: { setPageToRender: (page: string) => void
     const [username, setUsername] = useState<string>('');
     const [error, setError] = useState<string>('');
     const dispatch: AppDispatch = useDispatch();
+    const [loading, setLoading] = useState<boolean>(false);
 
     const handleSubmit = async () => {
+        if (!username) return;
+        setLoading(true);
         try {
             const response = await api.post('/conversation', {
                 username
@@ -29,6 +32,8 @@ function AddContact({setPageToRender}: { setPageToRender: (page: string) => void
             } else {
                 setError("Erreur réseau ou serveur")
             }
+        } finally {
+            setLoading(false);
         }
 
     }
@@ -66,7 +71,7 @@ function AddContact({setPageToRender}: { setPageToRender: (page: string) => void
                     onClick={handleSubmit}
                 >
                     <UserPlus size={20} className="mr-2"/>
-                    Commencer
+                    {loading ? "Chargement..." : "Commencer"}
                 </button>
                 {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
             </div>

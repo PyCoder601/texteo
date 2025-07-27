@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
                 port: '8002',
                 pathname: '/static/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'texteo-api.romeo-projects.online',
+                pathname: '/static/**',
+            },
         ],
     },
 };

@@ -18,6 +18,7 @@ function ProfileCard() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [editUsername, setEditUsername] = useState<boolean>(false);
     const [editBio, setEditBio] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -35,7 +36,6 @@ function ProfileCard() {
 
     const handleProfileUpdate = async () => {
         if (!user) return;
-        console.log(selectedFile)
         const formData = new FormData();
         if (selectedFile) {
             formData.append('profile_picture', selectedFile);
@@ -46,17 +46,19 @@ function ProfileCard() {
         if (bio && bio !== user.bio) {
             formData.append('bio', bio!);
         }
+        setLoading(true);
         try {
             const response = await api.patch('/me', formData);
             dispatch(setUser(response.data));
         } catch (e) {
-            alert("An error was occurred")
+            alert("Une erreur est survenue")
             console.log(e)
+        } finally {
+            setLoading(false);
         }
         setSelectedFile(null);
         setEditUsername(false);
         setEditBio(false);
-
     };
 
     const handleUpdateUsername = () => {
@@ -151,7 +153,9 @@ function ProfileCard() {
                             onClick={handleProfileUpdate}
                             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                         >
-                            Save Changes
+                            {
+                                loading ? "Enregistrement..." : "Enregistrer"
+                            }
                         </button>
                     </div>
                 )}

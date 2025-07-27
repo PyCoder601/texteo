@@ -12,11 +12,11 @@ const BarNav = [
         lien: "/fonctionalite"
     },
     {
-        title: "A propos",
+        title: "À propos",
         lien: "/a-propos"
     },
     {
-        "title": "se connecter",
+        "title": "Se connecter",
         "lien": "/login"
     }
 ];

@@ -17,6 +17,7 @@ import {ACCESS_TOKEN} from "@/utils/constant";
 import {AppDispatch} from "@/redux/store";
 import ContactInfo from "@/components/chat/ContactInfo";
 import {setCurrFriendStatus} from "@/redux/userSlice";
+import {useRouter} from "next/navigation";
 
 const websocketUrl: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
 
@@ -28,9 +29,20 @@ function Page() {
     const socketRef = React.useRef<WebSocket | null>(null);
     const dispatch: AppDispatch = useDispatch();
     const currentConversation = useSelector(selectCurrentConversation) || {id: 9999}
+    const router = useRouter();
+    const [isAuth, setIsAuth] = React.useState(false);
 
-   React.useEffect(() => {
+
+    React.useEffect(() => {
         if (!token) {
+            router.push("/login");
+        } else {
+            setIsAuth(true);
+        }
+    }, [token, router]);
+
+    React.useEffect(() => {
+        if (!isAuth) {
             return;
         }
 
@@ -102,7 +114,11 @@ function Page() {
         return () => {
             ws.close();
         };
-    }, [currentConversation?.id, token, dispatch]);
+    }, [currentConversation?.id, token, dispatch, isAuth]);
+
+    if (!isAuth) {
+        return null;
+    }
 
     return (
         <main

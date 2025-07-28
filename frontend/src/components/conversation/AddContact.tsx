@@ -7,14 +7,22 @@ import api from "@/service/api";
 import axios from "axios";
 import {AppDispatch} from "@/redux/store";
 import {fetchConversations, setCurrentConversation} from "@/redux/conversationSlice";
+import {selectUser} from "@/redux/userSlice";
+import {useRouter} from "next/navigation";
 
 
 function AddContact({setPageToRender}: { setPageToRender: (page: string) => void }) {
+    const user = useSelector(selectUser)
     const darkMode: boolean = useSelector(selectDarkMode);
     const [username, setUsername] = useState<string>('');
     const [error, setError] = useState<string>('');
     const dispatch: AppDispatch = useDispatch();
     const [loading, setLoading] = useState<boolean>(false);
+    const router = useRouter();
+
+    if (!user) {
+        router.push('/login')
+    }
 
     const handleSubmit = async () => {
         if (!username) return;

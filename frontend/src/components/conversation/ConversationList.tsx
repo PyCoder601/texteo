@@ -11,9 +11,17 @@ function ConversationList() {
     const conversations = useSelector(selectConversations);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const filteredConversations = conversations.filter((conversation) =>
-        conversation.friend.username.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    console.log(conversations)
+
+    const filteredConversations = conversations
+        .filter((conversation) =>
+            conversation.friend.username.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .sort((a, b) => {
+            const dateA = a.last_message_at ? new Date(a.last_message_at).getTime() : 0;
+            const dateB = b.last_message_at ? new Date(b.last_message_at).getTime() : 0;
+            return dateB - dateA;
+        });
 
     return (
         <div className={`flex flex-col h-full ${darkMode ? "bg-slate-800/50" : "bg-white/80"} backdrop-blur-sm`}>

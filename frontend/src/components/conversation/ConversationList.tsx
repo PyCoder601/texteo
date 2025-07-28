@@ -11,7 +11,6 @@ function ConversationList() {
     const conversations = useSelector(selectConversations);
     const [searchQuery, setSearchQuery] = useState("");
 
-    console.log(conversations)
 
     const filteredConversations = conversations
         .filter((conversation) =>

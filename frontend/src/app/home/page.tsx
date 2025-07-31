@@ -3,7 +3,7 @@ import React from "react";
 import ConversationList from "@/components/conversation/ConversationList";
 import ChatWindow from "@/components/chat/ChatWindow";
 import {useDispatch, useSelector} from "react-redux";
-import {selectDarkMode, selectShowContactInfo, setNotification} from "@/redux/uiSlice";
+import {selectDarkMode, selectShowContactInfo} from "@/redux/uiSlice";
 import Sidebar from "@/components/SideBar";
 import ProfileCard from "@/components/ProfieCard";
 import AddContact from "@/components/conversation/AddContact";
@@ -18,6 +18,7 @@ import {AppDispatch} from "@/redux/store";
 import ContactInfo from "@/components/chat/ContactInfo";
 import {setCurrFriendStatus} from "@/redux/userSlice";
 import {useRouter} from "next/navigation";
+import {showNotification} from "@/components/notification/showNotification";
 
 const websocketUrl: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
 
@@ -62,11 +63,11 @@ function Page() {
 
             if (data.type === "new_conversation") {
                 dispatch(fetchConversations());
-                dispatch(setNotification({
-                    type_event: "success",
-                    titre: "Nouveau message",
-                    message: `Vous avez un message venant de ${data.friend_name}`
-                }))
+                showNotification(
+                    "success",
+                    "Nouveau message",
+                    `Vous avez un message venant de ${data.friend_name}`
+                )
             }
 
             if (data.type === "supprimer_message") {
@@ -78,11 +79,11 @@ function Page() {
             }
 
             if (data.type === "new_reaction") {
-                dispatch(setNotification({
-                    titre: "reaction",
-                    type_event: "success",
-                    message: `${data.friend_name} a réagi à un message`
-                }))
+                showNotification(
+                    "success",
+                    "reaction",
+                    `${data.friend_name} a réagi à un message`
+                )
             }
 
             if (data.type === "supprimer_conversation") {

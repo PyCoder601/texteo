@@ -1,18 +1,11 @@
 import {UIType} from "@/utils/types";
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-
-interface NotificationState {
-  type_event: "success" | "error" | "info";
-  titre: string;
-  message: string;
-}
+import {createSlice} from "@reduxjs/toolkit";
 
 const initialState: UIType = {
   darkMode: true,
   toShowOptions: null,
   toShowReactions: null,
   showContactInfo: false,
-  notification: null,
 };
 
 const uiSlice = createSlice({
@@ -31,9 +24,6 @@ const uiSlice = createSlice({
     setShowContactInfo: (state, action) => {
       state.showContactInfo = action.payload;
     },
-    setNotification: (state, action: PayloadAction<NotificationState | null>) => {
-      state.notification = action.payload;
-    },
   },
 });
 
@@ -42,12 +32,10 @@ export const {
   setToShowReactions,
   setToShowOptions,
   setShowContactInfo,
-  setNotification,
 } = uiSlice.actions;
 export const selectDarkMode = (state: { ui: UIType }) => state.ui.darkMode;
 export const selectShowOptions = (state: { ui: UIType }) => state.ui.toShowOptions;
 export const selectShowReactions = (state: { ui: UIType }) => state.ui.toShowReactions;
 export const selectShowContactInfo = (state: { ui: UIType }) => state.ui.showContactInfo;
-export const selectNotification = (state: { ui: UIType }) => state.ui.notification;
 
 export default uiSlice.reducer;

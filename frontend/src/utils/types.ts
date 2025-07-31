@@ -3,11 +3,6 @@ export interface UIType {
     toShowOptions: number | null;
     toShowReactions: number | null;
     showContactInfo: boolean;
-    notification: {
-        type_event: "success" | "error" | "info";
-        titre: string;
-        message: string;
-    } | null;
 }
 
 export interface LoginDataType {

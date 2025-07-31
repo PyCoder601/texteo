@@ -2,6 +2,8 @@ import "./globals.css";
 import React from "react";
 import ReduxProvider from "@/redux/Provider";
 import MainContent from "./MainContent";
+import {ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function RootLayout({
                                        children,
@@ -19,6 +21,7 @@ export default function RootLayout({
         <body>
         <ReduxProvider>
             <MainContent>{children}</MainContent>
+            <ToastContainer/>
         </ReduxProvider>
         </body>
         </html>

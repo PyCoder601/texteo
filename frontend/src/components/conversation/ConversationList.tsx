@@ -32,7 +32,7 @@ function ConversationList() {
 
                     <input
                         type="text"
-                        placeholder="Search or start new chat"
+                        placeholder="Chercher une discussion"
                         className={`w-full pl-10 p-2 rounded-lg ${darkMode ? "bg-slate-700/50 border-slate-600" : "bg-gray-100 border-gray-300"} focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all`}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}

@@ -31,7 +31,7 @@ export default function Home() {
             <Header/>
             {/* Hero Section */}
             <section className="flex flex-col md:flex-row items-center justify-between
-            px-4 py-4 md:px-8 md:py-8 max-w-7xl mx-auto">
+            px-6 py-12 md:px-10 md:py-16 lg:px-16 lg:py-20 max-w-7xl xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto">
                 <motion.div
                     className="md:w-1/2 space-y-6 text-center md:text-left"
                     initial={{opacity: 0, x: -50}}
@@ -73,7 +73,8 @@ export default function Home() {
                     animate={{opacity: 1, scale: 1}}
                     transition={{duration: 0.7, type: "spring", stiffness: 100}}
                 >
-                    <div className="relative w-full md:w-[400px] h-[300px] md:h-[400px]">
+                    <div
+                        className="relative w-full md:w-[400px] h-[300px] md:h-[400px] lg:w-[500px] lg:h-[500px] xl:w-[550px] xl:h-[550px]">
                         <div
                             className="absolute inset-0 bg-gradient-to-tr from-teal-500 to-green-600
                              rounded-full blur-2xl opacity-30"></div>
